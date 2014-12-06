@@ -28,10 +28,16 @@ class Room extends Entity {
 	}
 	
 	public function updateTID () {
-		tID = switch (state) {
-			case ERoomState.HIDDEN:		0;
-			case ERoomState.VISIBLE:	1;
-			case ERoomState.LOCKED:		2;
+		switch (state) {
+			case ERoomState.HIDDEN:
+				tID = 0;
+			case ERoomState.VISIBLE:
+				tID = 1;
+			case ERoomState.LOCKED:
+				var r = Std.random(3);
+				if (r == 0)			tID = 2;
+				else if (r == 1)	tID = 9;
+				else				tID = 10;
 		}
 	}
 	

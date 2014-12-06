@@ -30,10 +30,11 @@ class Game extends Sprite {
 	var player:Player;
 	
 	var level:Int;
-	var levelUpAllowed:Bool;
+	var hasExplored:Bool;
+	var levelUpAllowed(get, null):Bool;
 	
 	var activeRoom:Int;
-	var lastRoom:Room;
+	var lastRoom:Int;
 	
 	var monstersLeft:Int;
 	var coins:Int;
@@ -57,7 +58,7 @@ class Game extends Sprite {
 		map = new WorldMap();
 		
 		activeRoom = 0;
-		lastRoom = null;
+		lastRoom = 0;
 		map.rooms[activeRoom].discover();
 		
 		// Add the rooms
@@ -71,14 +72,13 @@ class Game extends Sprite {
 		entities.push(player);
 		
 		level = 0;
-		levelUpAllowed = false;
+		hasExplored = false;
 		
 		monstersLeft = coins = 0;
 		
 		actions = new Map();
-		resetActions();
 		
-		showMessage();
+		showMessage(EMessage.Start);
 		
 		addEventListener(Event.ENTER_FRAME, update);
 	}
@@ -89,15 +89,27 @@ class Game extends Sprite {
 		actions.set(Keyboard.LEFT, null);
 		actions.set(Keyboard.RIGHT, null);
 		actions.set(Keyboard.SPACE, null);
+		actions.set(Keyboard.ENTER, levelUp);
 	}
 	
-	function showMessage () {
-		//trace("Press SPACE when ready");
-		actions.set(Keyboard.SPACE, startGame);
+	function showMessage (m:EMessage) {
+		resetActions();
+		switch (m) {
+			case EMessage.Start:
+				trace("Press SPACE when ready");
+				actions.set(Keyboard.SPACE, startGame);
+			case EMessage.GrabItem:
+				trace("Press SPACE to pickup the item");
+				actions.set(Keyboard.SPACE, grabItem);
+			case EMessage.FightOrFlee:
+				trace("Press SPACE to fight, any valid ARROW key to flee");
+				setMovementActions();
+				actions.set(Keyboard.SPACE, fight);
+		}
 	}
 	
 	function startGame () {
-		//trace("START");
+		trace("move with ARROW keys");
 		setMovementActions();
 	}
 	
@@ -153,7 +165,21 @@ class Game extends Sprite {
 			}
 		}
 		
-		if (hasMoved)	movePlayer();
+		if (hasMoved) {
+			movePlayer();
+		}
+	}
+	
+	function goToNextRoom () {
+		if (isInLastRoom())	return;
+		// Change room
+		activeRoom++;
+	}
+	
+	function goToPreviousRoom () {
+		if (isInFirstRoom())	return;
+		// Change room
+		activeRoom--;
 	}
 	
 	function movePlayer () {
@@ -164,66 +190,38 @@ class Game extends Sprite {
 		// Discover the room if new
 		if (r.state == ERoomState.HIDDEN) {
 			r.discover();
+			lastRoom = activeRoom;
+			hasExplored = true;
+			// Display room content if needed
 			if (r.content != null) {
 				r.content.x = r.x;
 				r.content.y = r.y;
 				entities.push(r.content);
+				// Player on top
 				entities.remove(player);
 				entities.push(player);
 			}
 		}
-		/*if (!map.rooms[activeRoom].discovered) {
-			//levelUpAllowed = true;
-			map.rooms[activeRoom].discover();
-			//
-			switch (map.rooms[activeRoom].type) {
-				case ERoomType.BATTLE:	monstersLeft++;
-				case ERoomType.ITEM:
-					if () {
-						trace("Press UP to grab the item");
-						resetActions();
-						actions.set(Keyboard.UP, grabItem);
-					}
-				case ERoomType.COINS:
-					if () {
-						trace("Press UP to grab the coins");
-						resetActions();
-						actions.set(Keyboard.UP, grabItem);
-					}
+		// React to content
+		if (r.content != null) {
+			if (Std.is(r.content, Treasure) || Std.is(r.content, Heart) || Std.is(r.content, Sword)) {
+				showMessage(EMessage.GrabItem);
+			} else if (Std.is(r.content, Monster)) {
+				showMessage(EMessage.FightOrFlee);
 			}
-		} else if () {
-			
-		}*/
-		// Room action(s)
-		/*switch (map.rooms[activeRoom].type) {
-			case ERoomType.BATTLE:
-				trace("Press UP to fight or DOWN to flee");
-				actions.set(Keyboard.UP, fight);
-				actions.set(Keyboard.DOWN, flee);
-			default:
-		}*/
+		}
 	}
 	
 	function fight () {
 		trace("You won");
-		//monstersLeft--;
-		//map.rooms[activeRoom].clear();
-		setMovementActions();
-	}
-	
-	function flee () {
-		trace("You escaped");
-		setMovementActions();
-	}
-	
-	function grabCoins () {
-		trace("Coins added");
+		cast(map.rooms[activeRoom].content, Monster).kill();
 		setMovementActions();
 	}
 	
 	function grabItem () {
 		trace("Item added");
-		//map.rooms[activeRoom].clear();
+		entities.remove(map.rooms[activeRoom].content);
+		map.rooms[activeRoom].content = null;
 		setMovementActions();
 	}
 	
@@ -231,6 +229,9 @@ class Game extends Sprite {
 		//
 		if (KeyboardMan.INST.getState(Keyboard.SPACE).justPressed && actions.get(Keyboard.SPACE) != null) {
 			actions.get(Keyboard.SPACE)();
+		}
+		if (KeyboardMan.INST.getState(Keyboard.ENTER).justPressed && actions.get(Keyboard.ENTER) != null) {
+			actions.get(Keyboard.ENTER)();
 		}
 		if (KeyboardMan.INST.getState(Keyboard.UP).justPressed && actions.get(Keyboard.UP) != null) {
 			actions.get(Keyboard.UP)();
@@ -254,45 +255,33 @@ class Game extends Sprite {
 		KeyboardMan.INST.update();
 	}
 	
-	/*function levelUp () {
-		if (!levelUpAllowed)	return;
-		if (monstersLeft + chestsLeft != 0) {
-			trace(monstersLeft + " monsters left to kill");
-			trace(chestsLeft + " chests left to loot");
+	function levelUp () {
+		if (!levelUpAllowed) {
+			trace("Unavailable for now");
 			return;
 		}
 		level++;
-		levelUpAllowed = false;
 		trace("Now level " + level);
 		//
-		activeRoom = furthestRoom;
+		activeRoom = lastRoom;
 		goToNextRoom();
 		movePlayer();
 		//
 		while (activeRoom > 0) {
 			var r = map.rooms.shift();
-			r.deactivate();
-			//entities.remove(r);
+			if (r.content != null) {
+				entities.remove(r.content);
+				r.content = null;
+			}
+			r.lock();
 			activeRoom--;
 		}
-		furthestRoom = activeRoom;
-	}*/
+		lastRoom = activeRoom;
+		hasExplored = false;
+	}
 	
 	function isInFirstRoom () :Bool { return activeRoom == 0; }
 	function isInLastRoom () :Bool { return activeRoom == map.rooms.length - 1; }
-	
-	function goToNextRoom () {
-		if (isInLastRoom())	return;
-		// Change room
-		activeRoom++;
-		//if (activeRoom > furthestRoom)	furthestRoom = activeRoom;
-	}
-	
-	function goToPreviousRoom () {
-		if (isInFirstRoom())	return;
-		// Change room
-		activeRoom--;
-	}
 	
 	function render () {
 		canvasData.fillRect(canvasData.rect, 0xFF000000);
@@ -301,12 +290,25 @@ class Game extends Sprite {
 		}
 	}
 	
+	function get_levelUpAllowed () :Bool {
+		var liveItems = 0;
+		for (e in entities) {
+			if (Std.is(e, Monster) && !cast(e, Monster).beaten)	liveItems++;
+			else if (Std.is(e, Heart) || Std.is(e, Sword) || Std.is(e, Treasure))	liveItems++;
+		}
+		return (hasExplored && liveItems == 0);
+	}
+	
 }
 
 typedef IntPoint = {x:Int, y:Int}
 
 
-
+enum EMessage {
+	Start;
+	GrabItem;
+	FightOrFlee;
+}
 
 
 
