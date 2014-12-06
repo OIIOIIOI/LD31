@@ -33,12 +33,12 @@ class Game extends Sprite {
 	var levelUpAllowed:Bool;
 	
 	var activeRoom:Int;
-	var furthestRoom:Int;
-	var playerLocked:Bool;
-	var allowedActions:Array<UInt>;
+	var lastRoom:Room;
+	
 	var monstersLeft:Int;
-	var chestsLeft:Int;
 	var coins:Int;
+	
+	var actions:Map<Int, Void->Void>;
 	
 	public function new () {
 		super();
@@ -56,11 +56,14 @@ class Game extends Sprite {
 		
 		map = new WorldMap();
 		
-		activeRoom = furthestRoom = 0;
+		activeRoom = 0;
+		lastRoom = null;
 		map.rooms[activeRoom].discover();
-		//level.rooms[activeRoom + 1].show();
 		
-		for (r in map.rooms)	entities.push(r);
+		// Add the rooms
+		for (r in map.rooms) {
+			entities.push(r);
+		}
 		
 		player = new Player();
 		player.x = map.rooms[activeRoom].x;
@@ -70,71 +73,176 @@ class Game extends Sprite {
 		level = 0;
 		levelUpAllowed = false;
 		
-		monstersLeft = chestsLeft = coins = 0;
-		allowedActions = [];
-		playerLocked = false;
+		monstersLeft = coins = 0;
+		
+		actions = new Map();
+		resetActions();
+		
+		showMessage();
 		
 		addEventListener(Event.ENTER_FRAME, update);
 	}
 	
-	function update (e:Event) {
-		// Player movement
+	function resetActions () {
+		actions.set(Keyboard.UP, null);
+		actions.set(Keyboard.DOWN, null);
+		actions.set(Keyboard.LEFT, null);
+		actions.set(Keyboard.RIGHT, null);
+		actions.set(Keyboard.SPACE, null);
+	}
+	
+	function showMessage () {
+		//trace("Press SPACE when ready");
+		actions.set(Keyboard.SPACE, startGame);
+	}
+	
+	function startGame () {
+		//trace("START");
+		setMovementActions();
+	}
+	
+	function setMovementActions () {
+		resetActions();
+		actions.set(Keyboard.UP, move.bind(Keyboard.UP));
+		actions.set(Keyboard.DOWN, move.bind(Keyboard.DOWN));
+		actions.set(Keyboard.LEFT, move.bind(Keyboard.LEFT));
+		actions.set(Keyboard.RIGHT, move.bind(Keyboard.RIGHT));
+	}
+	
+	function move (dir:UInt) {
 		var hasMoved = false;
-		if (!playerLocked) {
-			if (KeyboardMan.INST.getState(Keyboard.RIGHT).justPressed) {
-				if (!isInLastRoom() && map.rooms[activeRoom + 1].x > map.rooms[activeRoom].x) {
-					hasMoved = true;
-					goToNextRoom();
-				}
-				else if (!isInFirstRoom() && map.rooms[activeRoom - 1].x > map.rooms[activeRoom].x) {
-					hasMoved = true;
-					goToPreviousRoom();
-				}
+		
+		if (dir == Keyboard.UP) {
+			if (!isInLastRoom() && map.rooms[activeRoom + 1].y < map.rooms[activeRoom].y) {
+				hasMoved = true;
+				goToNextRoom();
 			}
-			else if (KeyboardMan.INST.getState(Keyboard.LEFT).justPressed) {
-				if (!isInLastRoom() && map.rooms[activeRoom + 1].x < map.rooms[activeRoom].x) {
-					hasMoved = true;
-					goToNextRoom();
-				}
-				else if (!isInFirstRoom() && map.rooms[activeRoom - 1].x < map.rooms[activeRoom].x) {
-					hasMoved = true;
-					goToPreviousRoom();
-				}
-			}
-			else if (KeyboardMan.INST.getState(Keyboard.UP).justPressed) {
-				if (!isInLastRoom() && map.rooms[activeRoom + 1].y < map.rooms[activeRoom].y) {
-					hasMoved = true;
-					goToNextRoom();
-				}
-				else if (!isInFirstRoom() && map.rooms[activeRoom - 1].y < map.rooms[activeRoom].y) {
-					hasMoved = true;
-					goToPreviousRoom();
-				}
-			}
-			else if (KeyboardMan.INST.getState(Keyboard.DOWN).justPressed) {
-				if (!isInLastRoom() && map.rooms[activeRoom + 1].y > map.rooms[activeRoom].y) {
-					hasMoved = true;
-					goToNextRoom();
-				}
-				else if (!isInFirstRoom() && map.rooms[activeRoom - 1].y > map.rooms[activeRoom].y) {
-					hasMoved = true;
-					goToPreviousRoom();
-				}
-			}
-			if (KeyboardMan.INST.getState(Keyboard.SPACE).justPressed) {
-				levelUp();
+			else if (!isInFirstRoom() && map.rooms[activeRoom - 1].y < map.rooms[activeRoom].y) {
+				hasMoved = true;
+				goToPreviousRoom();
 			}
 		}
-		// Special actions
-		for (a in allowedActions) {
-			if (KeyboardMan.INST.getState(a).justPressed) {
-				executeAction(a);
-				break;
+		else if (dir == Keyboard.DOWN) {
+			if (!isInLastRoom() && map.rooms[activeRoom + 1].y > map.rooms[activeRoom].y) {
+				hasMoved = true;
+				goToNextRoom();
+			}
+			else if (!isInFirstRoom() && map.rooms[activeRoom - 1].y > map.rooms[activeRoom].y) {
+				hasMoved = true;
+				goToPreviousRoom();
 			}
 		}
-		// Player action
-		if (hasMoved) {
-			movePlayer();
+		else if (dir == Keyboard.RIGHT) {
+			if (!isInLastRoom() && map.rooms[activeRoom + 1].x > map.rooms[activeRoom].x) {
+				hasMoved = true;
+				goToNextRoom();
+			}
+			else if (!isInFirstRoom() && map.rooms[activeRoom - 1].x > map.rooms[activeRoom].x) {
+				hasMoved = true;
+				goToPreviousRoom();
+			}
+		}
+		else if (dir == Keyboard.LEFT) {
+			if (!isInLastRoom() && map.rooms[activeRoom + 1].x < map.rooms[activeRoom].x) {
+				hasMoved = true;
+				goToNextRoom();
+			}
+			else if (!isInFirstRoom() && map.rooms[activeRoom - 1].x < map.rooms[activeRoom].x) {
+				hasMoved = true;
+				goToPreviousRoom();
+			}
+		}
+		
+		if (hasMoved)	movePlayer();
+	}
+	
+	function movePlayer () {
+		var r:Room = map.rooms[activeRoom];
+		// Move player
+		player.x = r.x;
+		player.y = r.y;
+		// Discover the room if new
+		if (r.state == ERoomState.HIDDEN) {
+			r.discover();
+			if (r.content != null) {
+				r.content.x = r.x;
+				r.content.y = r.y;
+				entities.push(r.content);
+				entities.remove(player);
+				entities.push(player);
+			}
+		}
+		/*if (!map.rooms[activeRoom].discovered) {
+			//levelUpAllowed = true;
+			map.rooms[activeRoom].discover();
+			//
+			switch (map.rooms[activeRoom].type) {
+				case ERoomType.BATTLE:	monstersLeft++;
+				case ERoomType.ITEM:
+					if () {
+						trace("Press UP to grab the item");
+						resetActions();
+						actions.set(Keyboard.UP, grabItem);
+					}
+				case ERoomType.COINS:
+					if () {
+						trace("Press UP to grab the coins");
+						resetActions();
+						actions.set(Keyboard.UP, grabItem);
+					}
+			}
+		} else if () {
+			
+		}*/
+		// Room action(s)
+		/*switch (map.rooms[activeRoom].type) {
+			case ERoomType.BATTLE:
+				trace("Press UP to fight or DOWN to flee");
+				actions.set(Keyboard.UP, fight);
+				actions.set(Keyboard.DOWN, flee);
+			default:
+		}*/
+	}
+	
+	function fight () {
+		trace("You won");
+		//monstersLeft--;
+		//map.rooms[activeRoom].clear();
+		setMovementActions();
+	}
+	
+	function flee () {
+		trace("You escaped");
+		setMovementActions();
+	}
+	
+	function grabCoins () {
+		trace("Coins added");
+		setMovementActions();
+	}
+	
+	function grabItem () {
+		trace("Item added");
+		//map.rooms[activeRoom].clear();
+		setMovementActions();
+	}
+	
+	function update (e:Event) {
+		//
+		if (KeyboardMan.INST.getState(Keyboard.SPACE).justPressed && actions.get(Keyboard.SPACE) != null) {
+			actions.get(Keyboard.SPACE)();
+		}
+		if (KeyboardMan.INST.getState(Keyboard.UP).justPressed && actions.get(Keyboard.UP) != null) {
+			actions.get(Keyboard.UP)();
+		}
+		if (KeyboardMan.INST.getState(Keyboard.DOWN).justPressed && actions.get(Keyboard.DOWN) != null) {
+			actions.get(Keyboard.DOWN)();
+		}
+		if (KeyboardMan.INST.getState(Keyboard.LEFT).justPressed && actions.get(Keyboard.LEFT) != null) {
+			actions.get(Keyboard.LEFT)();
+		}
+		if (KeyboardMan.INST.getState(Keyboard.RIGHT).justPressed && actions.get(Keyboard.RIGHT) != null) {
+			actions.get(Keyboard.RIGHT)();
 		}
 		// Update entities
 		for (e in entities) {
@@ -146,46 +254,7 @@ class Game extends Sprite {
 		KeyboardMan.INST.update();
 	}
 	
-	function movePlayer () {
-		// Move player
-		player.x = map.rooms[activeRoom].x;
-		player.y = map.rooms[activeRoom].y;
-		// Room action(s)
-		while (allowedActions.length > 0)	allowedActions.pop();
-		switch (map.rooms[activeRoom].type) {
-			case ERoomType.BATTLE:
-				trace("[F]ight or [R]un?");
-				playerLocked = true;
-				allowedActions.push(Keyboard.F);
-				allowedActions.push(Keyboard.R);
-			case ERoomType.CHEST:
-				trace("[L]oot or [R]un?");
-				playerLocked = true;
-				allowedActions.push(Keyboard.L);
-				allowedActions.push(Keyboard.R);
-			default:
-		}
-	}
-	
-	function executeAction (a:UInt) {
-		trace("Action " + a);
-		
-		if (a == Keyboard.F) {
-			trace("Fight is over, you won");
-			monstersLeft--;
-			map.rooms[activeRoom].clear();
-		}
-		else if (a == Keyboard.L) {
-			trace("You found good stuff");
-			chestsLeft--;
-			map.rooms[activeRoom].clear();
-		}
-		
-		playerLocked = false;
-		while (allowedActions.length > 0)	allowedActions.pop();
-	}
-	
-	function levelUp () {
+	/*function levelUp () {
 		if (!levelUpAllowed)	return;
 		if (monstersLeft + chestsLeft != 0) {
 			trace(monstersLeft + " monsters left to kill");
@@ -207,37 +276,16 @@ class Game extends Sprite {
 			activeRoom--;
 		}
 		furthestRoom = activeRoom;
-	}
+	}*/
 	
-	function isInFirstRoom () :Bool {
-		return activeRoom == 0;
-	}
-	
-	function isInLastRoom () :Bool {
-		return activeRoom == map.rooms.length - 1;
-	}
+	function isInFirstRoom () :Bool { return activeRoom == 0; }
+	function isInLastRoom () :Bool { return activeRoom == map.rooms.length - 1; }
 	
 	function goToNextRoom () {
 		if (isInLastRoom())	return;
 		// Change room
 		activeRoom++;
-		if (activeRoom > furthestRoom)	furthestRoom = activeRoom;
-		// Discover the room if new
-		if (!map.rooms[activeRoom].discovered) {
-			levelUpAllowed = true;
-			map.rooms[activeRoom].discover();
-			//
-			switch (map.rooms[activeRoom].type) {
-				case ERoomType.BATTLE:	monstersLeft++;
-				case ERoomType.CHEST:	chestsLeft++;
-				case ERoomType.COINS:	coins += 1 + level;
-			}
-			trace("Coins: " + coins);
-		}
-		// Show next room if existing and not visible already
-		// DEACTIVATED FOR BETTER GAMEPLAY?
-		//if (level.rooms.length > activeRoom + 1 && !level.rooms[activeRoom + 1].visible)
-			//level.rooms[activeRoom + 1].show();
+		//if (activeRoom > furthestRoom)	furthestRoom = activeRoom;
 	}
 	
 	function goToPreviousRoom () {

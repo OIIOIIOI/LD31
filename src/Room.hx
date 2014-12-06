@@ -7,52 +7,38 @@ package ;
 
 class Room extends Entity {
 	
-	public var type(default, null):ERoomType;
-	public var visible:Bool;
-	public var discovered:Bool;
+	public var state(default, null):ERoomState;
+	public var content:Entity;
 	
-	public function new (t:ERoomType) {
+	public function new () {
 		super();
 		
-		type = t;
-		visible = discovered = false;
-		
-		tID = 6;
-	}
-	
-	public function show () {
-		visible = true;
-		
-		tID = switch (type) {
-			case ERoomType.COINS:		3;
-			case ERoomType.CHEST:		4;
-			case ERoomType.BATTLE:	5;
-		}
+		state = ERoomState.HIDDEN;
+		updateTID();
 	}
 	
 	public function discover () {
-		if (!visible)	show();
-		discovered = true;
-		tID -= 3;
+		state = ERoomState.VISIBLE;
+		updateTID();
 	}
 	
-	public function clear () {
-		type = ERoomType.COINS;
-		tID = 0;
+	public function lock () {
+		state = ERoomState.LOCKED;
+		updateTID();
 	}
 	
-	public function deactivate () {
-		tID = 8;
-	}
-	
-	public function toString () {
-		return Std.string(type);
+	public function updateTID () {
+		tID = switch (state) {
+			case ERoomState.HIDDEN:		0;
+			case ERoomState.VISIBLE:	1;
+			case ERoomState.LOCKED:		2;
+		}
 	}
 	
 }
 
-enum ERoomType {
-	COINS;
-	BATTLE;
-	CHEST;
+enum ERoomState {
+	HIDDEN;
+	VISIBLE;
+	LOCKED;
 }

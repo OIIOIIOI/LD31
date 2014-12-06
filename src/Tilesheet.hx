@@ -10,7 +10,7 @@ import openfl.display.BitmapData;
 
 class Tilesheet {
 	
-	static public var TILE_SIZE:Int = 25;
+	static public var TILE_SIZE:Int = 24;
 	
 	static var data:BitmapData;
 	static var tiles:Array<Tile>;
@@ -19,15 +19,14 @@ class Tilesheet {
 		data = Assets.getBitmapData("img/tiles.png");
 		
 		tiles = [];
-		tiles.push({x:0, y:0, w:TILE_SIZE, h:TILE_SIZE});	// EMPTY discovered
-		tiles.push({x:25, y:0, w:TILE_SIZE, h:TILE_SIZE});	// LOOT discovered
-		tiles.push({x:50, y:0, w:TILE_SIZE, h:TILE_SIZE});	// BATTLE discovered
-		tiles.push({x:0, y:25, w:TILE_SIZE, h:TILE_SIZE});	// EMPTY visible
-		tiles.push({x:25, y:25, w:TILE_SIZE, h:TILE_SIZE});	// LOOT visible
-		tiles.push({x:50, y:25, w:TILE_SIZE, h:TILE_SIZE});	// BATTLE visible
-		tiles.push({x:75, y:25, w:TILE_SIZE, h:TILE_SIZE});	// Invisible room
-		tiles.push({x:75, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Player
-		tiles.push({x:0, y:50, w:TILE_SIZE, h:TILE_SIZE});	// Deactivated
+		tiles.push({x:0, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Hidden room
+		tiles.push({x:24, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Visible room
+		tiles.push({x:48, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Locked room
+		tiles.push({x:48, y:24, w:TILE_SIZE, h:TILE_SIZE});	// Player
+		tiles.push({x:72, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Treasure
+		tiles.push({x:96, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Heart
+		tiles.push({x:120, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Sword
+		tiles.push({x:72, y:24, w:TILE_SIZE, h:TILE_SIZE});	// Monster
 	}
 	
 	static public function draw (c:BitmapData, id:Int, x:Int, y:Int) {

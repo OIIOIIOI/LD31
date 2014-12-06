@@ -34,32 +34,32 @@ class WorldMap {
 	}
 	
 	function setupRooms () {
+		// Final array
 		rooms = new Array();
+		
+		// Content list
+		var contents:Array<Entity> = [];
+		for (i in 0...8)	contents.push(new Treasure());
+		for (i in 0...8)	contents.push(new Heart());
+		for (i in 0...8)	contents.push(new Sword());
+		for (i in 0...8)	contents.push(new Monster());
+		
+		// Create the rooms
 		var tmp = new Array();
-		for (i in 0...21)	tmp.push(new Room(ERoomType.COINS));
-		for (i in 0...17)	tmp.push(new Room(ERoomType.BATTLE));
-		for (i in 0...24)	tmp.push(new Room(ERoomType.CHEST));
-		// Always start with an empty room
-		var r = new Room(ERoomType.COINS);
-		var p = nextPosition();
-		r.x = p.x * Tilesheet.TILE_SIZE;
-		r.y = p.y * Tilesheet.TILE_SIZE;
-		rooms.push(r);
-		// Shuffle the rest
+		for (i in 0...(data.width * data.height)) {
+			var r = new Room();
+			if (contents.length > 0)	r.content = contents.pop();
+			tmp.push(r);
+		}
+		
+		// Shuffle the rooms
 		while (tmp.length > 0) {
-			r = tmp.splice(Game.RND.random(tmp.length), 1)[0];
-			p = nextPosition();
+			var r = tmp.splice(Game.RND.random(tmp.length), 1)[0];
+			var p = nextPosition();
 			r.x = p.x * Tilesheet.TILE_SIZE;
 			r.y = p.y * Tilesheet.TILE_SIZE;
 			rooms.push(r);
 		}
-		// Always end with a battle room
-		r = new Room(ERoomType.BATTLE);
-		p = nextPosition();
-		r.x = p.x * Tilesheet.TILE_SIZE;
-		r.y = p.y * Tilesheet.TILE_SIZE;
-		rooms.push(r);
-		//trace(rooms.length);
 	}
 	
 	public function nextPosition () :IntPoint {

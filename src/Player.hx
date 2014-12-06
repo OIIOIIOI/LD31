@@ -13,7 +13,7 @@ class Player extends Entity {
 	public function new () {
 		super();
 		
-		tID = 7;
+		tID = 3;
 		
 		health = 3;
 		dmg = 1;
