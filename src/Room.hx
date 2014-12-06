@@ -24,9 +24,9 @@ class Room extends Entity {
 		visible = true;
 		
 		tID = switch (type) {
-			case EMPTY:		3;
-			case LOOT:		4;
-			case BATTLE:	5;
+			case ERoomType.EMPTY:		3;
+			case ERoomType.CHEST:		4;
+			case ERoomType.BATTLE:	5;
 		}
 	}
 	
@@ -34,6 +34,11 @@ class Room extends Entity {
 		if (!visible)	show();
 		discovered = true;
 		tID -= 3;
+	}
+	
+	public function clear () {
+		type = ERoomType.EMPTY;
+		tID = 0;
 	}
 	
 	public function toString () {
@@ -45,5 +50,5 @@ class Room extends Entity {
 enum ERoomType {
 	EMPTY;
 	BATTLE;
-	LOOT;
+	CHEST;
 }

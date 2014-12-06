@@ -9,7 +9,7 @@ import Room;
  * @author 01101101
  */
 
-class Level {
+class WorldMap {
 	
 	public var data(default, null):BitmapData;
 	
@@ -38,7 +38,7 @@ class Level {
 		var tmp = new Array();
 		for (i in 0...21)	tmp.push(new Room(ERoomType.EMPTY));
 		for (i in 0...17)	tmp.push(new Room(ERoomType.BATTLE));
-		for (i in 0...24)	tmp.push(new Room(ERoomType.LOOT));
+		for (i in 0...24)	tmp.push(new Room(ERoomType.CHEST));
 		// Always start with an empty room
 		var r = new Room(ERoomType.EMPTY);
 		var p = nextPosition();

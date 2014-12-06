@@ -34,6 +34,9 @@ class KeyboardMan {
 		keys.set(Keyboard.RIGHT,	{ isDown:false, justPressed:false, justReleased:false } );
 		keys.set(Keyboard.DOWN,		{ isDown:false, justPressed:false, justReleased:false } );
 		keys.set(Keyboard.LEFT,		{ isDown:false, justPressed:false, justReleased:false } );
+		keys.set(Keyboard.F,		{ isDown:false, justPressed:false, justReleased:false } );
+		keys.set(Keyboard.L,		{ isDown:false, justPressed:false, justReleased:false } );
+		keys.set(Keyboard.R,		{ isDown:false, justPressed:false, justReleased:false } );
 		keys.set(Keyboard.SPACE,	{ isDown:false, justPressed:false, justReleased:false } );
 	}
 	
