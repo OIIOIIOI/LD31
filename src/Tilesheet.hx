@@ -19,9 +19,14 @@ class Tilesheet {
 		data = Assets.getBitmapData("img/tiles.png");
 		
 		tiles = [];
-		tiles.push({x:0, y:0, w:TILE_SIZE, h:TILE_SIZE});
-		tiles.push({x:25, y:0, w:TILE_SIZE, h:TILE_SIZE});
-		tiles.push({x:50, y:0, w:TILE_SIZE, h:TILE_SIZE});
+		tiles.push({x:0, y:0, w:TILE_SIZE, h:TILE_SIZE});	// EMPTY discovered
+		tiles.push({x:25, y:0, w:TILE_SIZE, h:TILE_SIZE});	// LOOT discovered
+		tiles.push({x:50, y:0, w:TILE_SIZE, h:TILE_SIZE});	// BATTLE discovered
+		tiles.push({x:0, y:25, w:TILE_SIZE, h:TILE_SIZE});	// EMPTY visible
+		tiles.push({x:25, y:25, w:TILE_SIZE, h:TILE_SIZE});	// LOOT visible
+		tiles.push({x:50, y:25, w:TILE_SIZE, h:TILE_SIZE});	// BATTLE visible
+		tiles.push({x:75, y:25, w:TILE_SIZE, h:TILE_SIZE});	// Invisible room
+		tiles.push({x:75, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Player
 	}
 	
 	static public function draw (c:BitmapData, id:Int, x:Int, y:Int) {

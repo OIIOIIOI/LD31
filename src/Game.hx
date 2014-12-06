@@ -20,15 +20,16 @@ class Game extends Sprite {
 	static public var TAP:Point = new Point();
 	static public var TAR:Rectangle = new Rectangle();
 	static public var SCALE:Int = 3;
-	static public var RND:Random = new Random(123454);
+	static public var RND:Random = new Random(123455);
 	
 	var canvasData:BitmapData;
 	var canvas:Bitmap;
 	
 	var entities:Array<Entity>;
-	
 	var level:Level;
-	var rooms:Array<Room>;
+	var player:Player;
+	
+	var activeRoom:Int;
 	
 	public function new () {
 		super();
@@ -44,48 +45,43 @@ class Game extends Sprite {
 		
 		entities = [];
 		
-		setupRooms();
-		
 		level = new Level();
-		var p = level.getNextRoom();
-		//var b = new Bitmap(level.data);
-		//b.scaleX = b.scaleY = 16;
-		//addChild(b);
 		
-		var r = rooms.shift();
-		r.x = p.x * Tilesheet.TILE_SIZE;
-		r.y = p.y * Tilesheet.TILE_SIZE;
-		entities.push(r);
+		activeRoom = 0;
+		level.rooms[activeRoom].discover();
+		level.rooms[activeRoom + 1].show();
+		
+		for (r in level.rooms)	entities.push(r);
+		
+		player = new Player();
+		player.x = level.rooms[activeRoom].x;
+		player.y = level.rooms[activeRoom].y;
+		entities.push(player);
 		
 		addEventListener(Event.ENTER_FRAME, update);
 	}
 	
-	function setupRooms () {
-		rooms = new Array();
-		var tmp = new Array();
-		for (i in 0...23)	tmp.push(new Room(ERoomType.EMPTY));
-		for (i in 0...16)	tmp.push(new Room(ERoomType.BATTLE));
-		for (i in 0...21)	tmp.push(new Room(ERoomType.LOOT));
-		// Always start with an empty room
-		rooms.push(new Room(ERoomType.EMPTY));
-		// Shuffle the rest
-		while (tmp.length > 0) {
-			rooms.push(tmp.splice(RND.random(tmp.length), 1)[0]);
-		}
-		// Always end with a battle room
-		rooms.push(new Room(ERoomType.BATTLE));
-		//trace(rooms.length);
-	}
-	
 	function update (e:Event) {
 		// Player input
-		if (KeyboardMan.INST.getState(Keyboard.SPACE).justPressed && rooms.length > 0) {
-			var p = level.getNextRoom();
-			var r = rooms.shift();
-			r.x = p.x * Tilesheet.TILE_SIZE;
-			r.y = p.y * Tilesheet.TILE_SIZE;
-			entities.push(r);
+		if (KeyboardMan.INST.getState(Keyboard.RIGHT).justPressed) {
+			if (!isInLastRoom() && level.rooms[activeRoom + 1].x > level.rooms[activeRoom].x)		goToNextRoom();
+			else if (!isInFirstRoom() && level.rooms[activeRoom - 1].x > level.rooms[activeRoom].x)	goToPreviousRoom();
 		}
+		else if (KeyboardMan.INST.getState(Keyboard.LEFT).justPressed) {
+			if (!isInLastRoom() && level.rooms[activeRoom + 1].x < level.rooms[activeRoom].x)		goToNextRoom();
+			else if (!isInFirstRoom() && level.rooms[activeRoom - 1].x < level.rooms[activeRoom].x)	goToPreviousRoom();
+		}
+		else if (KeyboardMan.INST.getState(Keyboard.UP).justPressed) {
+			if (!isInLastRoom() && level.rooms[activeRoom + 1].y < level.rooms[activeRoom].y)		goToNextRoom();
+			else if (!isInFirstRoom() && level.rooms[activeRoom - 1].y < level.rooms[activeRoom].y)	goToPreviousRoom();
+		}
+		else if (KeyboardMan.INST.getState(Keyboard.DOWN).justPressed) {
+			if (!isInLastRoom() && level.rooms[activeRoom + 1].y > level.rooms[activeRoom].y)		goToNextRoom();
+			else if (!isInFirstRoom() && level.rooms[activeRoom - 1].y > level.rooms[activeRoom].y)	goToPreviousRoom();
+		}
+		// Move player
+		player.x = level.rooms[activeRoom].x;
+		player.y = level.rooms[activeRoom].y;
 		// Update entities
 		for (e in entities) {
 			e.update();
@@ -94,6 +90,32 @@ class Game extends Sprite {
 		render();
 		// Update controls
 		KeyboardMan.INST.update();
+	}
+	
+	function isInFirstRoom () :Bool {
+		return activeRoom == 0;
+	}
+	
+	function isInLastRoom () :Bool {
+		return activeRoom == level.rooms.length - 1;
+	}
+	
+	function goToNextRoom () {
+		if (isInLastRoom())	return;
+		// Change room
+		activeRoom++;
+		// Discover the room if new
+		if (!level.rooms[activeRoom].discovered)
+			level.rooms[activeRoom].discover();
+		// Show next room if existing and not visible already
+		if (level.rooms.length > activeRoom + 1 && !level.rooms[activeRoom + 1].visible)
+			level.rooms[activeRoom + 1].show();
+	}
+	
+	function goToPreviousRoom () {
+		if (isInFirstRoom())	return;
+		// Change room
+		activeRoom--;
 	}
 	
 	function render () {
