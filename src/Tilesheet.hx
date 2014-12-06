@@ -27,6 +27,7 @@ class Tilesheet {
 		tiles.push({x:50, y:25, w:TILE_SIZE, h:TILE_SIZE});	// BATTLE visible
 		tiles.push({x:75, y:25, w:TILE_SIZE, h:TILE_SIZE});	// Invisible room
 		tiles.push({x:75, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Player
+		tiles.push({x:0, y:50, w:TILE_SIZE, h:TILE_SIZE});	// Deactivated
 	}
 	
 	static public function draw (c:BitmapData, id:Int, x:Int, y:Int) {

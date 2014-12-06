@@ -33,10 +33,12 @@ class Game extends Sprite {
 	var levelUpAllowed:Bool;
 	
 	var activeRoom:Int;
+	var furthestRoom:Int;
 	var playerLocked:Bool;
 	var allowedActions:Array<UInt>;
 	var monstersLeft:Int;
 	var chestsLeft:Int;
+	var coins:Int;
 	
 	public function new () {
 		super();
@@ -54,7 +56,7 @@ class Game extends Sprite {
 		
 		map = new WorldMap();
 		
-		activeRoom = 0;
+		activeRoom = furthestRoom = 0;
 		map.rooms[activeRoom].discover();
 		//level.rooms[activeRoom + 1].show();
 		
@@ -68,7 +70,7 @@ class Game extends Sprite {
 		level = 0;
 		levelUpAllowed = false;
 		
-		monstersLeft = chestsLeft = 0;
+		monstersLeft = chestsLeft = coins = 0;
 		allowedActions = [];
 		playerLocked = false;
 		
@@ -132,24 +134,7 @@ class Game extends Sprite {
 		}
 		// Player action
 		if (hasMoved) {
-			// Move player
-			player.x = map.rooms[activeRoom].x;
-			player.y = map.rooms[activeRoom].y;
-			// Room action(s)
-			while (allowedActions.length > 0)	allowedActions.pop();
-			switch (map.rooms[activeRoom].type) {
-				case ERoomType.BATTLE:
-					trace("[F]ight or [R]un?");
-					playerLocked = true;
-					allowedActions.push(Keyboard.F);
-					allowedActions.push(Keyboard.R);
-				case ERoomType.CHEST:
-					trace("[L]oot or [R]un?");
-					playerLocked = true;
-					allowedActions.push(Keyboard.L);
-					allowedActions.push(Keyboard.R);
-				default:
-			}
+			movePlayer();
 		}
 		// Update entities
 		for (e in entities) {
@@ -159,6 +144,27 @@ class Game extends Sprite {
 		render();
 		// Update controls
 		KeyboardMan.INST.update();
+	}
+	
+	function movePlayer () {
+		// Move player
+		player.x = map.rooms[activeRoom].x;
+		player.y = map.rooms[activeRoom].y;
+		// Room action(s)
+		while (allowedActions.length > 0)	allowedActions.pop();
+		switch (map.rooms[activeRoom].type) {
+			case ERoomType.BATTLE:
+				trace("[F]ight or [R]un?");
+				playerLocked = true;
+				allowedActions.push(Keyboard.F);
+				allowedActions.push(Keyboard.R);
+			case ERoomType.CHEST:
+				trace("[L]oot or [R]un?");
+				playerLocked = true;
+				allowedActions.push(Keyboard.L);
+				allowedActions.push(Keyboard.R);
+			default:
+		}
 	}
 	
 	function executeAction (a:UInt) {
@@ -188,7 +194,19 @@ class Game extends Sprite {
 		}
 		level++;
 		levelUpAllowed = false;
-		trace("now level " + level);
+		trace("Now level " + level);
+		//
+		activeRoom = furthestRoom;
+		goToNextRoom();
+		movePlayer();
+		//
+		while (activeRoom > 0) {
+			var r = map.rooms.shift();
+			r.deactivate();
+			//entities.remove(r);
+			activeRoom--;
+		}
+		furthestRoom = activeRoom;
 	}
 	
 	function isInFirstRoom () :Bool {
@@ -203,16 +221,18 @@ class Game extends Sprite {
 		if (isInLastRoom())	return;
 		// Change room
 		activeRoom++;
+		if (activeRoom > furthestRoom)	furthestRoom = activeRoom;
 		// Discover the room if new
 		if (!map.rooms[activeRoom].discovered) {
 			levelUpAllowed = true;
 			map.rooms[activeRoom].discover();
-			// Count
-			if (map.rooms[activeRoom].type == ERoomType.BATTLE) {
-				monstersLeft++;
-			} else if (map.rooms[activeRoom].type == ERoomType.CHEST) {
-				chestsLeft++;
+			//
+			switch (map.rooms[activeRoom].type) {
+				case ERoomType.BATTLE:	monstersLeft++;
+				case ERoomType.CHEST:	chestsLeft++;
+				case ERoomType.COINS:	coins += 1 + level;
 			}
+			trace("Coins: " + coins);
 		}
 		// Show next room if existing and not visible already
 		// DEACTIVATED FOR BETTER GAMEPLAY?
@@ -227,7 +247,7 @@ class Game extends Sprite {
 	}
 	
 	function render () {
-		canvasData.fillRect(canvasData.rect, 0xFF808080);
+		canvasData.fillRect(canvasData.rect, 0xFF000000);
 		for (e in entities) {
 			Tilesheet.draw(canvasData, e.tileID, e.x, e.y);
 		}

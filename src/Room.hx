@@ -24,7 +24,7 @@ class Room extends Entity {
 		visible = true;
 		
 		tID = switch (type) {
-			case ERoomType.EMPTY:		3;
+			case ERoomType.COINS:		3;
 			case ERoomType.CHEST:		4;
 			case ERoomType.BATTLE:	5;
 		}
@@ -37,8 +37,12 @@ class Room extends Entity {
 	}
 	
 	public function clear () {
-		type = ERoomType.EMPTY;
+		type = ERoomType.COINS;
 		tID = 0;
+	}
+	
+	public function deactivate () {
+		tID = 8;
 	}
 	
 	public function toString () {
@@ -48,7 +52,7 @@ class Room extends Entity {
 }
 
 enum ERoomType {
-	EMPTY;
+	COINS;
 	BATTLE;
 	CHEST;
 }

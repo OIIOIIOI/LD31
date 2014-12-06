@@ -36,11 +36,11 @@ class WorldMap {
 	function setupRooms () {
 		rooms = new Array();
 		var tmp = new Array();
-		for (i in 0...21)	tmp.push(new Room(ERoomType.EMPTY));
+		for (i in 0...21)	tmp.push(new Room(ERoomType.COINS));
 		for (i in 0...17)	tmp.push(new Room(ERoomType.BATTLE));
 		for (i in 0...24)	tmp.push(new Room(ERoomType.CHEST));
 		// Always start with an empty room
-		var r = new Room(ERoomType.EMPTY);
+		var r = new Room(ERoomType.COINS);
 		var p = nextPosition();
 		r.x = p.x * Tilesheet.TILE_SIZE;
 		r.y = p.y * Tilesheet.TILE_SIZE;
