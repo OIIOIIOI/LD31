@@ -7,10 +7,27 @@ package ;
 
 class Room extends Entity {
 	
-	public function new () {
+	public var type(default, null):ERoomType;
+	
+	public function new (t:ERoomType) {
 		super();
 		
-		tID = 0;
+		type = t;
+		tID = switch (type) {
+			case EMPTY:		0;
+			case LOOT:		1;
+			case BATTLE:	2;
+		}
 	}
 	
+	public function toString () {
+		return Std.string(type);
+	}
+	
+}
+
+enum ERoomType {
+	EMPTY;
+	BATTLE;
+	LOOT;
 }

@@ -8,6 +8,7 @@ import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import openfl.Lib;
 import openfl.ui.Keyboard;
+import Room;
 
 /**
  * ...
@@ -19,6 +20,7 @@ class Game extends Sprite {
 	static public var TAP:Point = new Point();
 	static public var TAR:Rectangle = new Rectangle();
 	static public var SCALE:Int = 3;
+	static public var RND:Random = new Random(123454);
 	
 	var canvasData:BitmapData;
 	var canvas:Bitmap;
@@ -26,6 +28,7 @@ class Game extends Sprite {
 	var entities:Array<Entity>;
 	
 	var level:Level;
+	var rooms:Array<Room>;
 	
 	public function new () {
 		super();
@@ -41,13 +44,15 @@ class Game extends Sprite {
 		
 		entities = [];
 		
+		setupRooms();
+		
 		level = new Level();
 		var p = level.getNextRoom();
 		//var b = new Bitmap(level.data);
 		//b.scaleX = b.scaleY = 16;
 		//addChild(b);
 		
-		var r = new Room();
+		var r = rooms.shift();
 		r.x = p.x * Tilesheet.TILE_SIZE;
 		r.y = p.y * Tilesheet.TILE_SIZE;
 		entities.push(r);
@@ -55,11 +60,28 @@ class Game extends Sprite {
 		addEventListener(Event.ENTER_FRAME, update);
 	}
 	
+	function setupRooms () {
+		rooms = new Array();
+		var tmp = new Array();
+		for (i in 0...23)	tmp.push(new Room(ERoomType.EMPTY));
+		for (i in 0...16)	tmp.push(new Room(ERoomType.BATTLE));
+		for (i in 0...21)	tmp.push(new Room(ERoomType.LOOT));
+		// Always start with an empty room
+		rooms.push(new Room(ERoomType.EMPTY));
+		// Shuffle the rest
+		while (tmp.length > 0) {
+			rooms.push(tmp.splice(RND.random(tmp.length), 1)[0]);
+		}
+		// Always end with a battle room
+		rooms.push(new Room(ERoomType.BATTLE));
+		//trace(rooms.length);
+	}
+	
 	function update (e:Event) {
 		// Player input
-		if (KeyboardMan.INST.getState(Keyboard.SPACE).justPressed) {
+		if (KeyboardMan.INST.getState(Keyboard.SPACE).justPressed && rooms.length > 0) {
 			var p = level.getNextRoom();
-			var r = new Room();
+			var r = rooms.shift();
 			r.x = p.x * Tilesheet.TILE_SIZE;
 			r.y = p.y * Tilesheet.TILE_SIZE;
 			entities.push(r);

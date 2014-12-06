@@ -21,6 +21,7 @@ class Tilesheet {
 		tiles = [];
 		tiles.push({x:0, y:0, w:TILE_SIZE, h:TILE_SIZE});
 		tiles.push({x:25, y:0, w:TILE_SIZE, h:TILE_SIZE});
+		tiles.push({x:50, y:0, w:TILE_SIZE, h:TILE_SIZE});
 	}
 	
 	static public function draw (c:BitmapData, id:Int, x:Int, y:Int) {
