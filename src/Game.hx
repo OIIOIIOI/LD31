@@ -263,14 +263,14 @@ class Game extends Sprite {
 		var st = 30;
 		// Player initiative
 		if (player.init > e.init) {
-			trace("You strike first! " + player.health + "H/" + player.dmg + "D/" + player.init + "I");
+			//trace("You strike first! " + player.health + "H/" + player.dmg + "D/" + player.init + "I");
 			timedAction = fightRound.bind(player, e);
 			timer = st;
 			//fightRound(player, e);
 		}
 		// Monster initiative
 		else if (player.init < e.init) {
-			trace("The monster strikes first! " + e.health + "H/" + e.dmg + "D/" + e.init + "I");
+			//trace("The monster strikes first! " + e.health + "H/" + e.dmg + "D/" + e.init + "I");
 			timedAction = fightRound.bind(e, player);
 			timer = st;
 			//fightRound(e, player);
@@ -278,13 +278,13 @@ class Game extends Sprite {
 		// Random initiative
 		else {
 			if (RND.random(3) == 0) {
-				trace("The monster strikes first! " + e.health + "H/" + e.dmg + "D/" + e.init + "I");
+				//trace("The monster strikes first! " + e.health + "H/" + e.dmg + "D/" + e.init + "I");
 				timedAction = fightRound.bind(e, player);
 				timer = st;
 				//fightRound(e, player);
 			}
 			else {
-				trace("You strike first! " + player.health + "H/" + player.dmg + "D/" + player.init + "I");
+				//trace("You strike first! " + player.health + "H/" + player.dmg + "D/" + player.init + "I");
 				timedAction = fightRound.bind(player, e);
 				timer = st;
 				//fightRound(player, e);
@@ -333,7 +333,7 @@ class Game extends Sprite {
 	
 	function levelUp () {
 		level++;
-		trace("New level: " + level);
+		//trace("New level: " + level);
 		KeyboardMan.INST.cancelJustPressed(Keyboard.SPACE);
 		goToNextRoom();
 		/*for (i in 0...activeRoom) {
