@@ -26,33 +26,26 @@ class Room extends Entity {
 		updateTID();
 	}
 	
-	public function lock () {
-		state = ERoomState.S_LOCKED;
-		updateTID();
-	}
-	
 	public function updateTID (force:Bool = false) {
 		switch (state) {
-			case ERoomState.S_HIDDEN:	tID = 18;
+			case ERoomState.S_HIDDEN:	tID = 0;
 			case ERoomState.S_VISIBLE:	tID = 1;
-			case ERoomState.S_LOCKED:	tID = 2;
 		}
 		if (state != S_HIDDEN) {
 			switch (type) {
-				case ERoomType.T_LOOT:		tID += 0;
-				case ERoomType.T_ITEM:		tID += 3;
-				case ERoomType.T_MONSTER:	tID += 6;
-				case ERoomType.T_START:		tID += 0;
-				case ERoomType.T_END:		tID += 0;
+				case ERoomType.T_ITEM:		tID = 4;
+				case ERoomType.T_MONSTER:	tID = 7;
+				case ERoomType.T_START:		tID = 2;
+				case ERoomType.T_END:		tID = 5;
+				default:
 			}
 		}
 		else if (force) {
 			switch (type) {
-				case ERoomType.T_LOOT:		tID = 0;
 				case ERoomType.T_ITEM:		tID = 3;
 				case ERoomType.T_MONSTER:	tID = 6;
-				case ERoomType.T_START:		tID = 0;
-				case ERoomType.T_END:		tID = 0;
+				case ERoomType.T_END:		tID = 18;
+				default:
 			}
 		}
 	}
@@ -62,7 +55,6 @@ class Room extends Entity {
 enum ERoomState {
 	S_HIDDEN;
 	S_VISIBLE;
-	S_LOCKED;
 }
 
 enum ERoomType {

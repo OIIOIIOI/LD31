@@ -21,15 +21,15 @@ class Tilesheet {
 		tiles = [];
 		tiles.push({x:0, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Hidden loot room		0
 		tiles.push({x:24, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Visible loot room	1
-		tiles.push({x:48, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Locked loot room		2
+		tiles.push({x:48, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Visible start room	2
 		
 		tiles.push({x:0, y:24, w:TILE_SIZE, h:TILE_SIZE});	// Hidden item room		3
 		tiles.push({x:24, y:24, w:TILE_SIZE, h:TILE_SIZE});	// Visible item room	4
-		tiles.push({x:48, y:24, w:TILE_SIZE, h:TILE_SIZE});	// Locked item room		5
+		tiles.push({x:48, y:24, w:TILE_SIZE, h:TILE_SIZE});	// Visible end room		5
 		
 		tiles.push({x:0, y:48, w:TILE_SIZE, h:TILE_SIZE});	// Hidden monster room	6
 		tiles.push({x:24, y:48, w:TILE_SIZE, h:TILE_SIZE});	// Visible monster room	7
-		tiles.push({x:48, y:48, w:TILE_SIZE, h:TILE_SIZE});	// Locked monster room	8
+		tiles.push({x:48, y:48, w:TILE_SIZE, h:TILE_SIZE});	// 						8	<----------- FREE
 		
 		tiles.push({x:72, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Player				9
 		
@@ -44,7 +44,7 @@ class Tilesheet {
 		tiles.push({x:144, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Item					16
 		tiles.push({x:144, y:24, w:TILE_SIZE, h:TILE_SIZE});// Item opened			17
 		
-		tiles.push({x:0, y:72, w:TILE_SIZE, h:TILE_SIZE});	// Hidden room			18
+		tiles.push({x:0, y:72, w:TILE_SIZE, h:TILE_SIZE});	// Hidden exit room		18
 		
 		tiles.push({x:0, y:96, w:144, h:36});	// Item select BG					19
 		tiles.push({x:0, y:132, w:34, h:9});	// Arrows ON/ON						20
@@ -100,6 +100,15 @@ class Tilesheet {
 		tiles.push({x:72, y:48, w:TILE_SIZE, h:TILE_SIZE});// Player dead			59
 		
 		tiles.push({x:144, y:96, w:144, h:36});	// Item select BG 2					60
+
+		tiles.push({x:34, y:312, w:97, h:18});	// Room desc start					61
+		tiles.push({x:34, y:330, w:97, h:18});	// Room desc end					62
+		tiles.push({x:34, y:348, w:97, h:18});	// Room desc game over				63
+		
+		tiles.push({x:131, y:168, w:70, h:9});	// Action start						64
+		tiles.push({x:131, y:177, w:70, h:9});	// Action restart					65
+		
+		tiles.push({x:34, y:366, w:97, h:18});	// Room desc fight win				66
 	}
 	
 	static public function draw (c:BitmapData, id:Int, x:Int = 0, y:Int = 0) {

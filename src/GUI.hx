@@ -61,28 +61,18 @@ class GUI extends Bitmap {
 	
 	public function displayFight () {
 		clear();
-		// BG
-		Tilesheet.draw(bitmapData, 19);
-		// Desc
-		Tilesheet.draw(bitmapData, 51, 38, 3);
-		// Image
-		Tilesheet.draw(bitmapData, 36, 3, 3);
-		// Space
-		Tilesheet.draw(bitmapData, 28, 38, 22);
-		// Action
-		Tilesheet.draw(bitmapData, 52, 71, 24);
+		Tilesheet.draw(bitmapData, 19);// BG
+		Tilesheet.draw(bitmapData, 51, 38-35, 3);// Desc
+		Tilesheet.draw(bitmapData, 28, 38-35, 22);// Space
+		Tilesheet.draw(bitmapData, 52, 71-35, 24);// Action
 	}
 	
 	public function displayEmpty () {
 		clear();
-		// BG
-		Tilesheet.draw(bitmapData, 19);
-		// Desc
-		Tilesheet.draw(bitmapData, 32, 38, 3);
-		// Space
-		Tilesheet.draw(bitmapData, 28, 38, 22);
-		// Action
-		Tilesheet.draw(bitmapData, 29, 71, 24);
+		Tilesheet.draw(bitmapData, 19);// BG
+		Tilesheet.draw(bitmapData, 32, 38-35, 3);// Desc
+		Tilesheet.draw(bitmapData, 28, 38-35, 22);// Space
+		Tilesheet.draw(bitmapData, 29, 71-35, 24);// Action
 	}
 	
 	public function displayLoot (tier:Int, coins:Int) {
@@ -95,13 +85,13 @@ class GUI extends Bitmap {
 			case 2:		35;
 			default:	33;
 		}
-		Tilesheet.draw(bitmapData, tID, 38, 3);
+		Tilesheet.draw(bitmapData, tID, 38-35, 3);
 		// Space
-		Tilesheet.draw(bitmapData, 28, 38, 22);
+		Tilesheet.draw(bitmapData, 28, 38-35, 22);
 		// Action
-		Tilesheet.draw(bitmapData, 31, 71, 24);
+		Tilesheet.draw(bitmapData, 31, 71-35, 24);
 		// Number
-		displayNumber(coins, 62, 11, false);
+		displayNumber(coins, 62-35, 11, false);
 	}
 	
 	public function displayStats (health:Int, dmg:Int, init:Int, loot:Int) {
@@ -109,18 +99,51 @@ class GUI extends Bitmap {
 		// BG
 		Tilesheet.draw(bitmapData, 60, 0, 36);
 		// Number
-		displayNumber(health, 20, 40);
-		displayNumber(dmg, 20, 60);
-		displayNumber(loot, 100, 40);
-		displayNumber(init, 100, 60);
+		displayNumber(health, 47, 41);
+		displayNumber(dmg, 47, 57);
+		displayNumber(loot, 101, 41, false, true);
+		displayNumber(init, 101, 57, false, true);
 	}
 	
-	function displayNumber (n:Int, xx:Int, yy:Int, center:Bool = true) {
+	public function displayStart () {
+		clear();
+		Tilesheet.draw(bitmapData, 19);// BG
+		Tilesheet.draw(bitmapData, 61, 38, 3);// Desc
+		Tilesheet.draw(bitmapData, 28, 38, 22);// Space
+		Tilesheet.draw(bitmapData, 64, 71, 24);// Action
+	}
+	
+	public function displayEnd () {
+		clear();
+		Tilesheet.draw(bitmapData, 19);// BG
+		Tilesheet.draw(bitmapData, 62, 38, 3);// Desc
+		Tilesheet.draw(bitmapData, 28, 38, 22);// Space
+		Tilesheet.draw(bitmapData, 65, 71, 24);// Action
+	}
+	
+	public function displayWinFight () {
+		clear();
+		Tilesheet.draw(bitmapData, 19);// BG
+		Tilesheet.draw(bitmapData, 66, 38-35, 3);// Desc
+		Tilesheet.draw(bitmapData, 28, 38-35, 22);// Space
+		Tilesheet.draw(bitmapData, 29, 71-35, 24);// Action
+	}
+	
+	public function displayGameOver () {
+		clear();
+		Tilesheet.draw(bitmapData, 19);// BG
+		Tilesheet.draw(bitmapData, 63, 38, 3);// Desc
+		Tilesheet.draw(bitmapData, 28, 38, 22);// Space
+		Tilesheet.draw(bitmapData, 65, 71, 24);// Action
+	}
+	
+	function displayNumber (n:Int, xx:Int, yy:Int, center:Bool = true, right:Bool = false) {
 		var s = Std.string(n);
 		var a = s.split("");
 		// Calculate width
 		var w = 5 * a.length;
-		if (center)	xx -= Std.int(w / 2);
+		if (center)		xx -= Std.int(w / 2);
+		else if (right)	xx -= w;
 		xx--;
 		// Draw
 		for (i in a) {

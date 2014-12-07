@@ -21,7 +21,7 @@ class Game extends Sprite {
 	static public var TAP:Point = new Point();
 	static public var TAR:Rectangle = new Rectangle();
 	static public var SCALE:Int = 3;
-	static public var RND:Random = new Random(123455);
+	static public var RND:Random = new Random(Std.random(900000) + 100000);
 	
 	var canvasData:BitmapData;
 	var canvas:Bitmap;
@@ -183,10 +183,13 @@ class Game extends Sprite {
 			actions.set(Keyboard.RIGHT, selectItem.bind(1));
 			actions.set(Keyboard.SPACE, grabItem);
 		}
-		else {
-			if (r.type == ERoomType.T_END)	trace("THE END");
-			screen.displayEmpty();
+		else if (r.type == ERoomType.T_START) {
+			screen.displayStart();
 			setDefaultActions();
+		}
+		else if (r.type == ERoomType.T_END) {
+			screen.displayEnd();
+			//setDefaultActions();
 		}
 	}
 	
@@ -257,18 +260,19 @@ class Game extends Sprite {
 	}
 	
 	function fight (e:Monster) {
+		var st = 30;
 		// Player initiative
 		if (player.init > e.init) {
 			trace("You strike first! " + player.health + "H/" + player.dmg + "D/" + player.init + "I");
 			timedAction = fightRound.bind(player, e);
-			timer = 60;
+			timer = st;
 			//fightRound(player, e);
 		}
 		// Monster initiative
 		else if (player.init < e.init) {
 			trace("The monster strikes first! " + e.health + "H/" + e.dmg + "D/" + e.init + "I");
 			timedAction = fightRound.bind(e, player);
-			timer = 60;
+			timer = st;
 			//fightRound(e, player);
 		}
 		// Random initiative
@@ -276,13 +280,13 @@ class Game extends Sprite {
 			if (RND.random(3) == 0) {
 				trace("The monster strikes first! " + e.health + "H/" + e.dmg + "D/" + e.init + "I");
 				timedAction = fightRound.bind(e, player);
-				timer = 60;
+				timer = st;
 				//fightRound(e, player);
 			}
 			else {
 				trace("You strike first! " + player.health + "H/" + player.dmg + "D/" + player.init + "I");
 				timedAction = fightRound.bind(player, e);
-				timer = 60;
+				timer = st;
 				//fightRound(player, e);
 			}
 		}
@@ -312,8 +316,6 @@ class Game extends Sprite {
 			}
 		}
 		else {
-			if (def == player)	trace("Your health: " + def.health);
-			else				trace("Monster health: " + def.health);
 			// Change roles and fight next round
 			timedAction = fightRound.bind(def, att);
 			timer = 60;
@@ -322,12 +324,10 @@ class Game extends Sprite {
 	}
 	
 	function fightWon () {
-		trace("You won!");
-		//
 		map.rooms[activeRoom].content.x = map.rooms[activeRoom].x;
 		player.x  = map.rooms[activeRoom].x;
 		//
-		screen.displayEmpty();
+		screen.displayWinFight();
 		setDefaultActions();
 	}
 	
@@ -346,11 +346,10 @@ class Game extends Sprite {
 	}
 	
 	function gameOver () {
-		trace("GAME OVER");
-		//
 		map.rooms[activeRoom].content.x = map.rooms[activeRoom].x;
 		player.x  = map.rooms[activeRoom].x;
 		//
+		screen.displayGameOver();
 		resetActions();
 	}
 	
