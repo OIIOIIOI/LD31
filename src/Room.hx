@@ -31,16 +31,25 @@ class Room extends Entity {
 		updateTID();
 	}
 	
-	public function updateTID () {
+	public function updateTID (force:Bool = false) {
 		switch (state) {
-			case ERoomState.S_HIDDEN:	tID = 0;
+			case ERoomState.S_HIDDEN:	tID = 18;
 			case ERoomState.S_VISIBLE:	tID = 1;
 			case ERoomState.S_LOCKED:	tID = 2;
 		}
-		switch (type) {
-			case ERoomType.T_LOOT:		tID += 0;
-			case ERoomType.T_ITEM:		tID += 3;
-			case ERoomType.T_MONSTER:	tID += 6;
+		if (state != S_HIDDEN) {
+			switch (type) {
+				case ERoomType.T_LOOT:		tID += 0;
+				case ERoomType.T_ITEM:		tID += 3;
+				case ERoomType.T_MONSTER:	tID += 6;
+			}
+		}
+		else if (force) {
+			switch (type) {
+				case ERoomType.T_LOOT:		tID = 0;
+				case ERoomType.T_ITEM:		tID = 3;
+				case ERoomType.T_MONSTER:	tID = 6;
+			}
 		}
 	}
 	

@@ -39,8 +39,12 @@ class Tilesheet {
 		tiles.push({x:96, y:72, w:TILE_SIZE, h:TILE_SIZE});	// No loot				13
 		
 		tiles.push({x:120, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Monster				14
+		tiles.push({x:120, y:24, w:TILE_SIZE, h:TILE_SIZE});// Monster dead			15
 		
-		tiles.push({x:144, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Item					15
+		tiles.push({x:144, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Item					16
+		tiles.push({x:144, y:24, w:TILE_SIZE, h:TILE_SIZE});// Item opened			17
+		
+		tiles.push({x:0, y:72, w:TILE_SIZE, h:TILE_SIZE});	// Hidden room			18
 	}
 	
 	static public function draw (c:BitmapData, id:Int, x:Int, y:Int) {

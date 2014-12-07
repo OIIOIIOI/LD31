@@ -17,8 +17,6 @@ class FightEntity extends Entity {
 		health = dmg = init = 1;
 	}
 	
-	public function die () {
-		trace("TODO: change tID");
-	}
+	public function die () { }
 	
 }

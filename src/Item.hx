@@ -7,18 +7,14 @@ package ;
 
 class Item extends Entity {
 	
-	public var type:EItemType;
-	
 	public function new () {
 		super();
 		
-		type = EItemType.T_LEVELUP;
-		
-		tID = 15;
+		tID = 16;
 	}
 	
 	public function open () {
-		trace("TODO: change tID");
+		tID = 17;
 	}
 	
 }
@@ -27,4 +23,6 @@ enum EItemType {
 	T_HEALTH;
 	T_WEAPON;
 	T_LEVELUP;
+	T_INITIATIVE;
+	T_MAP;
 }

@@ -26,4 +26,10 @@ class Monster extends FightEntity {
 		tID = 14;
 	}
 	
+	override public function die ()  {
+		super.die();
+		
+		tID = 15;
+	}
+	
 }

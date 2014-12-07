@@ -38,6 +38,7 @@ class Game extends Sprite {
 	var selectedItem:Int;
 	
 	var activeRoom:Int;
+	var foundMap:Bool;
 	
 	var actions:Map<Int, Void->Void>;
 	
@@ -76,6 +77,8 @@ class Game extends Sprite {
 		
 		availableItems = [];
 		selectedItem = 0;
+		
+		foundMap = false;
 		
 		activeRoom = -1;
 		goToNextRoom();
@@ -144,10 +147,7 @@ class Game extends Sprite {
 		}
 		else if (r.type == ERoomType.T_ITEM && e != null) {
 			trace("Select an item with the ARROWS and press SPACE to grab it");
-			availableItems.push(EItemType.T_HEALTH);
-			availableItems.push(EItemType.T_WEAPON);
-			availableItems.push(EItemType.T_LEVELUP);
-			selectedItem = 0;
+			chooseItems();
 			trace("Selected: " + availableItems[selectedItem]);
 			actions.set(Keyboard.LEFT, selectItem.bind(-1));
 			actions.set(Keyboard.RIGHT, selectItem.bind(1));
@@ -163,34 +163,65 @@ class Game extends Sprite {
 		actions.set(Keyboard.SPACE, goToNextRoom);
 	}
 	
+	function chooseItems () {
+		// Always available
+		availableItems.push(EItemType.T_LEVELUP);
+		// Random
+		var a:Array<EItemType> = [];
+		a.push(EItemType.T_HEALTH);
+		a.push(EItemType.T_WEAPON);
+		a.push(EItemType.T_INITIATIVE);
+		if (!foundMap)	a.push(EItemType.T_MAP);
+		// Pick 2
+		while (availableItems.length < 3) {
+			availableItems.push(a.splice(Game.RND.random(a.length), 1)[0]);
+		}
+		// Reset selection
+		selectedItem = 0;
+	}
+	
 	function selectItem (dir:Int) {
 		selectedItem = Std.int(Math.min(Math.max(selectedItem + dir, 0), availableItems.length - 1));
 		trace("Selected: " + availableItems[selectedItem]);
 	}
 	
 	function grabItem () {
-		trace("You picked " + availableItems[selectedItem]);
+		var item = availableItems[selectedItem];
+		trace("You picked " + item);
+		// Clear items
+		while (availableItems.length > 0)	availableItems.pop();
+		resetActions();
 		// Update entity
 		var e:Item = cast(map.rooms[activeRoom].content, Item);
 		e.open();
 		// Apply effect
-		switch (availableItems[selectedItem]) {
-			case EItemType.T_LEVELUP:
-				level++;
-				trace("New level: " + level);
+		switch (item) {
 			case EItemType.T_HEALTH:
 				player.health++;
 				trace("New health: " + player.health);
+				trace("Press SPACE to leave the room");
+				actions.set(Keyboard.SPACE, goToNextRoom);
 			case EItemType.T_WEAPON:
 				player.dmg++;
 				trace("New dmg: " + player.dmg);
+				trace("Press SPACE to leave the room");
+				actions.set(Keyboard.SPACE, goToNextRoom);
+			case EItemType.T_INITIATIVE:
+				player.init++;
+				trace("New init: " + player.init);
+				trace("Press SPACE to leave the room");
+				actions.set(Keyboard.SPACE, goToNextRoom);
+			case EItemType.T_MAP:
+				trace("Map updated");
+				for (i in (activeRoom + 1)...map.rooms.length) {
+					map.rooms[i].updateTID(true);
+				}
+				foundMap = true;
+				trace("Press SPACE to leave the room");
+				actions.set(Keyboard.SPACE, goToNextRoom);
+			case EItemType.T_LEVELUP:
+				levelUp();
 		}
-		// Clear items
-		while (availableItems.length > 0)	availableItems.pop();
-		// Default action
-		trace("Press SPACE to leave the room");
-		resetActions();
-		actions.set(Keyboard.SPACE, goToNextRoom);
 	}
 	
 	function fight (e:Monster) {
@@ -239,6 +270,20 @@ class Game extends Sprite {
 		trace("You won!");
 		trace("Press SPACE to leave the room");
 		actions.set(Keyboard.SPACE, goToNextRoom);
+	}
+	
+	function levelUp () {
+		level++;
+		trace("New level: " + level);
+		KeyboardMan.INST.cancelJustPressed(Keyboard.SPACE);
+		goToNextRoom();
+		for (i in 0...activeRoom) {
+			map.rooms[i].lock();
+			if (map.rooms[i].content != null) {
+				entities.remove(map.rooms[i].content);
+				map.rooms[i].content = null;
+			}
+		}
 	}
 	
 	function gameOver () {
