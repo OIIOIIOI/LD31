@@ -109,6 +109,10 @@ class Tilesheet {
 		tiles.push({x:131, y:177, w:70, h:9});	// Action restart					65
 		
 		tiles.push({x:34, y:366, w:97, h:18});	// Room desc fight win				66
+		
+		tiles.push({x:0, y:242, w:34, h:9});	// Arrow f2							67
+		tiles.push({x:0, y:251, w:34, h:9});	// Arrow f2							68
+		tiles.push({x:0, y:260, w:34, h:9});	// Arrow f2							69
 	}
 	
 	static public function draw (c:BitmapData, id:Int, x:Int = 0, y:Int = 0) {

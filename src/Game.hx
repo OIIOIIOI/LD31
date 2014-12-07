@@ -201,8 +201,6 @@ class Game extends Sprite {
 	}
 	
 	function chooseItems () {
-		// Always available
-		availableItems.push(EItemType.T_LEVELUP);
 		// Random
 		var a:Array<EItemType> = [];
 		a.push(EItemType.T_HEALTH);
@@ -210,9 +208,11 @@ class Game extends Sprite {
 		a.push(EItemType.T_INITIATIVE);
 		if (!foundMap)	a.push(EItemType.T_MAP);
 		// Pick 2
-		while (availableItems.length < 3) {
+		while (availableItems.length < 2) {
 			availableItems.push(a.splice(Game.RND.random(a.length), 1)[0]);
 		}
+		// Always available
+		availableItems.push(EItemType.T_LEVELUP);
 		// Reset selection
 		selectedItem = 0;
 		// Update display
@@ -372,6 +372,7 @@ class Game extends Sprite {
 		// Render
 		render();
 		screen.displayStats(player.health, player.dmg, player.init, totalLoot);
+		screen.update();
 		// Update controls
 		KeyboardMan.INST.update();
 	}

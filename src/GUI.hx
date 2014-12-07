@@ -12,12 +12,19 @@ import openfl.display.BitmapData;
 
 class GUI extends Bitmap {
 	
+	var animArrows:Bool;
+	var animTID:Int;
+	var animTick:Int;
+	var animDuration:Int;
+	
 	public function new () {
 		super();
 		
 		scaleX = scaleY = 2;
 		
 		bitmapData = new BitmapData(144, 72, false, 0xFF000033);
+		
+		animArrows = false;
 	}
 	
 	public function clear (top:Bool = true, bottom:Bool = false) {
@@ -27,6 +34,7 @@ class GUI extends Bitmap {
 		if (top) {
 			Game.TAR.y = 0;
 			bitmapData.fillRect(Game.TAR, 0xFF006633);
+			animArrows = false;
 		}
 		if (bottom) {
 			Game.TAR.y = 36;
@@ -53,6 +61,9 @@ class GUI extends Bitmap {
 		else if (isLast)	tID = 22;
 		else				tID = 20;
 		Tilesheet.draw(bitmapData, tID, 1, 23);
+		animArrows = true;
+		animDuration = animTick = 10;
+		animTID = tID;
 		// Space
 		Tilesheet.draw(bitmapData, 28, 38, 22);
 		// Action
@@ -150,7 +161,25 @@ class GUI extends Bitmap {
 			Tilesheet.draw(bitmapData, 41 + Std.parseInt(i), xx, yy);
 			xx += 5;
 		}
-		
+	}
+	
+	public function update () {
+		if (animArrows) {
+			if (animTick > 0) {
+				animTick--;
+				if (animTick == 0) {
+					if (animTID == 20)		animTID = 67;
+					else if (animTID == 21)	animTID = 68;
+					else if (animTID == 22)	animTID = 69;
+					else if (animTID == 67)	animTID = 20;
+					else if (animTID == 68)	animTID = 21;
+					else if (animTID == 69)	animTID = 22;
+					//
+					Tilesheet.draw(bitmapData, animTID, 1, 23);
+					animTick = animDuration;
+				}
+			}
+		}
 	}
 	
 }
