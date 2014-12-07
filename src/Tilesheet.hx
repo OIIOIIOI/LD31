@@ -56,6 +56,19 @@ class Tilesheet {
 		tiles.push({x:34, y:168, w:97, h:18});	// Item desc map					25
 		tiles.push({x:34, y:186, w:97, h:18});	// Item desc level up				26
 		tiles.push({x:34, y:204, w:97, h:18});	// Item desc initiative				27
+		
+		tiles.push({x:0, y:159, w:30, h:11});	// Space button						28
+		
+		tiles.push({x:131, y:132, w:70, h:9});	// Action leave room				29
+		tiles.push({x:131, y:141, w:70, h:9});	// Action choose item				30
+		tiles.push({x:131, y:150, w:70, h:9});	// Action collect					31
+		
+		tiles.push({x:34, y:222, w:97, h:18});	// Room desc empty					32
+		tiles.push({x:34, y:240, w:97, h:18});	// Room desc loot S					33
+		tiles.push({x:34, y:258, w:97, h:18});	// Room desc loot M					34
+		tiles.push({x:34, y:276, w:97, h:18});	// Room desc loot L					35
+		
+		tiles.push({x:0, y:170, w:30, h:30});	// Empty square						36
 	}
 	
 	static public function draw (c:BitmapData, id:Int, x:Int = 0, y:Int = 0) {

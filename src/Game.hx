@@ -87,12 +87,10 @@ class Game extends Sprite {
 		
 		foundMap = false;
 		
+		actions = new Map();
+		
 		activeRoom = -1;
 		goToNextRoom();
-		
-		actions = new Map();
-		trace("Press SPACE to leave the room");
-		actions.set(Keyboard.SPACE, goToNextRoom);
 		
 		addEventListener(Event.ENTER_FRAME, update);
 	}
@@ -144,9 +142,15 @@ class Game extends Sprite {
 	function updateGUI () {
 		var r:Room = map.rooms[activeRoom];
 		var e:Entity = r.content;
-		if (r.type == ERoomType.T_LOOT && e != null && cast(e, Loot).value > 0) {
-			trace("Press SPACE to pick-up " + cast(e, Loot).value + " gold");
-			actions.set(Keyboard.SPACE, pickUpLoot.bind(cast(e, Loot)));
+		if (r.type == ERoomType.T_LOOT && e != null) {
+			if (cast(e, Loot).value > 0) {
+				screen.displayLoot(cast(e, Loot).tier, cast(e, Loot).value);
+				actions.set(Keyboard.SPACE, pickUpLoot.bind(cast(e, Loot)));
+			}
+			else {
+				screen.displayEmpty();
+				actions.set(Keyboard.SPACE, goToNextRoom);
+			}
 		}
 		else if (r.type == ERoomType.T_MONSTER && e != null) {
 			trace("A " + cast(e, Monster).health + "H/" + cast(e, Monster).dmg + "D/" + cast(e, Monster).init + "I monster attacks! Press SPACE to fight");
@@ -164,7 +168,7 @@ class Game extends Sprite {
 		totalLoot += e.value;
 		e.pickup();
 		trace("Total loot: " + totalLoot);
-		trace("Press SPACE to leave the room");
+		screen.displayEmpty();
 		actions.set(Keyboard.SPACE, goToNextRoom);
 	}
 	
@@ -207,17 +211,17 @@ class Game extends Sprite {
 			case EItemType.T_HEALTH:
 				player.health++;
 				trace("New health: " + player.health);
-				trace("Press SPACE to leave the room");
+				screen.displayEmpty();
 				actions.set(Keyboard.SPACE, goToNextRoom);
 			case EItemType.T_WEAPON:
 				player.dmg++;
 				trace("New dmg: " + player.dmg);
-				trace("Press SPACE to leave the room");
+				screen.displayEmpty();
 				actions.set(Keyboard.SPACE, goToNextRoom);
 			case EItemType.T_INITIATIVE:
 				player.init++;
 				trace("New init: " + player.init);
-				trace("Press SPACE to leave the room");
+				screen.displayEmpty();
 				actions.set(Keyboard.SPACE, goToNextRoom);
 			case EItemType.T_MAP:
 				trace("Map updated");
@@ -225,7 +229,7 @@ class Game extends Sprite {
 					map.rooms[i].updateTID(true);
 				}
 				foundMap = true;
-				trace("Press SPACE to leave the room");
+				screen.displayEmpty();
 				actions.set(Keyboard.SPACE, goToNextRoom);
 			case EItemType.T_LEVELUP:
 				levelUp();
@@ -276,7 +280,7 @@ class Game extends Sprite {
 	
 	function fightWon () {
 		trace("You won!");
-		trace("Press SPACE to leave the room");
+		screen.displayEmpty();
 		actions.set(Keyboard.SPACE, goToNextRoom);
 	}
 	
