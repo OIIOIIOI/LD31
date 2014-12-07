@@ -5,18 +5,16 @@ package ;
  * @author 01101101
  */
 
-class Player extends Entity {
-	
-	public var health(default, null):Int;
-	public var dmg(default, null):Int;
+class Player extends FightEntity {
 	
 	public function new () {
 		super();
 		
-		tID = 3;
-		
 		health = 3;
 		dmg = 1;
+		init = 1;
+		
+		tID = 9;
 	}
 	
 }

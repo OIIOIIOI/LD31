@@ -5,12 +5,12 @@ package ;
  * @author 01101101
  */
 
-class Heart extends Entity {
+class Item extends Entity {
 	
 	public function new () {
 		super();
 		
-		tID = 5;
+		tID = 15;
 	}
 	
 }
