@@ -1,7 +1,5 @@
 package ;
 
-import flash.display.Sprite;
-import flash.events.Event;
 import flash.Lib;
 
 /**
@@ -9,7 +7,7 @@ import flash.Lib;
  * @author 01101101
  */
 
-class Main extends Sprite {
+class Main {
 	
 	public static function main () {
 		// static entry point

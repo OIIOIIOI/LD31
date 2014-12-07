@@ -45,9 +45,20 @@ class Tilesheet {
 		tiles.push({x:144, y:24, w:TILE_SIZE, h:TILE_SIZE});// Item opened			17
 		
 		tiles.push({x:0, y:72, w:TILE_SIZE, h:TILE_SIZE});	// Hidden room			18
+		
+		tiles.push({x:0, y:96, w:144, h:36});	// Item select BG					19
+		tiles.push({x:0, y:132, w:34, h:9});	// Arrows ON/ON						20
+		tiles.push({x:0, y:141, w:34, h:9});	// Arrows OFF/ON					21
+		tiles.push({x:0, y:150, w:34, h:9});	// Arrows ON/OFF					22
+		
+		tiles.push({x:34, y:132, w:97, h:18});	// Item desc health					23
+		tiles.push({x:34, y:150, w:97, h:18});	// Item desc dmg					24
+		tiles.push({x:34, y:168, w:97, h:18});	// Item desc map					25
+		tiles.push({x:34, y:186, w:97, h:18});	// Item desc level up				26
+		tiles.push({x:34, y:204, w:97, h:18});	// Item desc initiative				27
 	}
 	
-	static public function draw (c:BitmapData, id:Int, x:Int, y:Int) {
+	static public function draw (c:BitmapData, id:Int, x:Int = 0, y:Int = 0) {
 		if (id < 0 || id >= tiles.length)	return false;
 		
 		Game.TAR.x = tiles[id].x;

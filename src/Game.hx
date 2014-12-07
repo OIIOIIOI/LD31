@@ -40,7 +40,9 @@ class Game extends Sprite {
 	var activeRoom:Int;
 	var foundMap:Bool;
 	
-	var actions:Map<Int, Void->Void>;
+	var actions:Map < Int, Void->Void > ;
+	
+	var screen:GUI;
 	
 	public function new () {
 		super();
@@ -53,6 +55,11 @@ class Game extends Sprite {
 		canvas = new Bitmap(canvasData);
 		canvas.scaleX = canvas.scaleY = SCALE;
 		addChild(canvas);
+		
+		screen = new GUI();
+		screen.x = 288;
+		screen.y = 288;
+		addChild(screen);
 		
 		entities = [];
 		
@@ -146,9 +153,7 @@ class Game extends Sprite {
 			actions.set(Keyboard.SPACE, fight.bind(cast(e, Monster)));
 		}
 		else if (r.type == ERoomType.T_ITEM && e != null) {
-			trace("Select an item with the ARROWS and press SPACE to grab it");
 			chooseItems();
-			trace("Selected: " + availableItems[selectedItem]);
 			actions.set(Keyboard.LEFT, selectItem.bind(-1));
 			actions.set(Keyboard.RIGHT, selectItem.bind(1));
 			actions.set(Keyboard.SPACE, grabItem);
@@ -178,11 +183,14 @@ class Game extends Sprite {
 		}
 		// Reset selection
 		selectedItem = 0;
+		// Update display
+		screen.displayItem(availableItems[selectedItem], selectedItem == 0, selectedItem == availableItems.length - 1);
 	}
 	
 	function selectItem (dir:Int) {
 		selectedItem = Std.int(Math.min(Math.max(selectedItem + dir, 0), availableItems.length - 1));
-		trace("Selected: " + availableItems[selectedItem]);
+		// Update display
+		screen.displayItem(availableItems[selectedItem], selectedItem == 0, selectedItem == availableItems.length - 1);
 	}
 	
 	function grabItem () {
