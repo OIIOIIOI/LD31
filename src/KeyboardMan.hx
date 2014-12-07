@@ -30,12 +30,9 @@ class KeyboardMan {
 	function registerKeys () {
 		if (keys != null)	return;
 		keys = new Map<Int, KeyState>();
-		keys.set(Keyboard.UP,		{ isDown:false, justPressed:false, justReleased:false } );
 		keys.set(Keyboard.RIGHT,	{ isDown:false, justPressed:false, justReleased:false } );
-		keys.set(Keyboard.DOWN,		{ isDown:false, justPressed:false, justReleased:false } );
 		keys.set(Keyboard.LEFT,		{ isDown:false, justPressed:false, justReleased:false } );
 		keys.set(Keyboard.SPACE,	{ isDown:false, justPressed:false, justReleased:false } );
-		keys.set(Keyboard.ENTER,	{ isDown:false, justPressed:false, justReleased:false } );
 	}
 	
 	function keyDownHandler (e:KeyboardEvent) {

@@ -1,5 +1,6 @@
 package ;
 
+import Item;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.Sprite;
@@ -32,6 +33,9 @@ class Game extends Sprite {
 	var level:Int;
 	var luck:Int;
 	var totalLoot:Int;
+	
+	var availableItems:Array<EItemType>;
+	var selectedItem:Int;
 	
 	var activeRoom:Int;
 	
@@ -70,10 +74,14 @@ class Game extends Sprite {
 		luck = 0;
 		totalLoot = 0;
 		
+		availableItems = [];
+		selectedItem = 0;
+		
 		activeRoom = -1;
 		goToNextRoom();
 		
 		actions = new Map();
+		trace("Press SPACE to leave the room");
 		actions.set(Keyboard.SPACE, goToNextRoom);
 		
 		addEventListener(Event.ENTER_FRAME, update);
@@ -85,6 +93,8 @@ class Game extends Sprite {
 	}
 	
 	function resetActions () {
+		actions.set(Keyboard.RIGHT, null);
+		actions.set(Keyboard.LEFT, null);
 		actions.set(Keyboard.SPACE, null);
 	}
 	
@@ -128,9 +138,20 @@ class Game extends Sprite {
 			trace("Press SPACE to pick-up " + cast(e, Loot).value + " gold");
 			actions.set(Keyboard.SPACE, pickUpLoot.bind(cast(e, Loot)));
 		}
-		else if (r.type == ERoomType.T_MONSTER) {
+		else if (r.type == ERoomType.T_MONSTER && e != null) {
 			trace("A " + cast(e, Monster).health + "H/" + cast(e, Monster).dmg + "D/" + cast(e, Monster).init + "I monster attacks! Press SPACE to fight");
 			actions.set(Keyboard.SPACE, fight.bind(cast(e, Monster)));
+		}
+		else if (r.type == ERoomType.T_ITEM && e != null) {
+			trace("Select an item with the ARROWS and press SPACE to grab it");
+			availableItems.push(EItemType.T_HEALTH);
+			availableItems.push(EItemType.T_WEAPON);
+			availableItems.push(EItemType.T_LEVELUP);
+			selectedItem = 0;
+			trace("Selected: " + availableItems[selectedItem]);
+			actions.set(Keyboard.LEFT, selectItem.bind(-1));
+			actions.set(Keyboard.RIGHT, selectItem.bind(1));
+			actions.set(Keyboard.SPACE, grabItem);
 		}
 	}
 	
@@ -138,28 +159,59 @@ class Game extends Sprite {
 		totalLoot += e.value;
 		e.pickup();
 		trace("Total loot: " + totalLoot);
+		trace("Press SPACE to leave the room");
+		actions.set(Keyboard.SPACE, goToNextRoom);
+	}
+	
+	function selectItem (dir:Int) {
+		selectedItem = Std.int(Math.min(Math.max(selectedItem + dir, 0), availableItems.length - 1));
+		trace("Selected: " + availableItems[selectedItem]);
+	}
+	
+	function grabItem () {
+		trace("You picked " + availableItems[selectedItem]);
+		// Update entity
+		var e:Item = cast(map.rooms[activeRoom].content, Item);
+		e.open();
+		// Apply effect
+		switch (availableItems[selectedItem]) {
+			case EItemType.T_LEVELUP:
+				level++;
+				trace("New level: " + level);
+			case EItemType.T_HEALTH:
+				player.health++;
+				trace("New health: " + player.health);
+			case EItemType.T_WEAPON:
+				player.dmg++;
+				trace("New dmg: " + player.dmg);
+		}
+		// Clear items
+		while (availableItems.length > 0)	availableItems.pop();
+		// Default action
+		trace("Press SPACE to leave the room");
+		resetActions();
 		actions.set(Keyboard.SPACE, goToNextRoom);
 	}
 	
 	function fight (e:Monster) {
 		// Player initiative
 		if (player.init > e.init) {
-			trace("You strike first");
+			trace("You strike first! " + player.health + "H/" + player.dmg + "D/" + player.init + "I");
 			fightRound(player, e);
 		}
 		// Monster initiative
 		else if (player.init < e.init) {
-			trace("The monster strikes first");
+			trace("The monster strikes first! " + e.health + "H/" + e.dmg + "D/" + e.init + "I");
 			fightRound(e, player);
 		}
 		// Random initiative
 		else {
 			if (RND.random(3) == 0) {
-				trace("The monster strikes first");
+				trace("The monster strikes first! " + e.health + "H/" + e.dmg + "D/" + e.init + "I");
 				fightRound(e, player);
 			}
 			else {
-				trace("You strike first");
+				trace("You strike first! " + player.health + "H/" + player.dmg + "D/" + player.init + "I");
 				fightRound(player, e);
 			}
 		}
@@ -176,7 +228,8 @@ class Game extends Sprite {
 			else				fightWon();
 		}
 		else {
-			trace("Your health: " + player.health);
+			if (def == player)	trace("Your health: " + def.health);
+			else				trace("Monster health: " + def.health);
 			// Change roles and fight next round
 			fightRound(def, att);
 		}
@@ -184,6 +237,7 @@ class Game extends Sprite {
 	
 	function fightWon () {
 		trace("You won!");
+		trace("Press SPACE to leave the room");
 		actions.set(Keyboard.SPACE, goToNextRoom);
 	}
 	
@@ -194,9 +248,9 @@ class Game extends Sprite {
 	
 	function update (e:Event) {
 		// Player input
-		if (KeyboardMan.INST.getState(Keyboard.SPACE).justPressed && actions.get(Keyboard.SPACE) != null) {
-			actions.get(Keyboard.SPACE)();
-		}
+		if (KeyboardMan.INST.getState(Keyboard.SPACE).justPressed && actions.get(Keyboard.SPACE) != null)	actions.get(Keyboard.SPACE)();
+		if (KeyboardMan.INST.getState(Keyboard.LEFT).justPressed && actions.get(Keyboard.LEFT) != null)	actions.get(Keyboard.LEFT)();
+		if (KeyboardMan.INST.getState(Keyboard.RIGHT).justPressed && actions.get(Keyboard.RIGHT) != null)	actions.get(Keyboard.RIGHT)();
 		// Update entities
 		for (e in entities) {
 			e.update();
