@@ -164,7 +164,8 @@ class Game extends Sprite {
 			}
 		}
 		else if (r.type == ERoomType.T_MONSTER && e != null) {
-			trace("A " + cast(e, Monster).health + "H/" + cast(e, Monster).dmg + "D/" + cast(e, Monster).init + "I monster attacks! Press SPACE to fight");
+			//trace("A " + cast(e, Monster).health + "H/" + cast(e, Monster).dmg + "D/" + cast(e, Monster).init + "I monster attacks! Press SPACE to fight");
+			screen.displayFight();
 			actions.set(Keyboard.SPACE, fight.bind(cast(e, Monster)));
 		}
 		else if (r.type == ERoomType.T_ITEM && e != null) {
@@ -176,9 +177,10 @@ class Game extends Sprite {
 	}
 	
 	function displayStat (dir:Int) {
-		selectedStat += dir;
-		if (selectedStat < 0)	selectedStat += 4;
-		if (selectedStat > 3)	selectedStat -= 4;
+		selectedStat = Std.int(Math.min(Math.max(selectedStat + dir, 0), 3));
+		//selectedStat += dir;
+		//if (selectedStat < 0)	selectedStat += 4;
+		//if (selectedStat > 3)	selectedStat -= 4;
 		screen.displayEmpty(selectedStat, getStatValue());
 	}
 	
@@ -303,6 +305,7 @@ class Game extends Sprite {
 	
 	function fightWon () {
 		trace("You won!");
+		selectedStat = 0;
 		screen.displayEmpty(selectedStat, getStatValue());
 		setDefaultActions();
 	}
@@ -329,7 +332,7 @@ class Game extends Sprite {
 	function update (e:Event) {
 		// Player input
 		if (KeyboardMan.INST.getState(Keyboard.SPACE).justPressed && actions.get(Keyboard.SPACE) != null)	actions.get(Keyboard.SPACE)();
-		if (KeyboardMan.INST.getState(Keyboard.LEFT).justPressed && actions.get(Keyboard.LEFT) != null)	actions.get(Keyboard.LEFT)();
+		if (KeyboardMan.INST.getState(Keyboard.LEFT).justPressed && actions.get(Keyboard.LEFT) != null)		actions.get(Keyboard.LEFT)();
 		if (KeyboardMan.INST.getState(Keyboard.RIGHT).justPressed && actions.get(Keyboard.RIGHT) != null)	actions.get(Keyboard.RIGHT)();
 		// Update entities
 		for (e in entities) {

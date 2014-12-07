@@ -85,6 +85,10 @@ class Tilesheet {
 		tiles.push({x:10, y:234, w:5, h:8});	// Number 7							48
 		tiles.push({x:15, y:234, w:5, h:8});	// Number 8							49
 		tiles.push({x:20, y:234, w:5, h:8});	// Number 9							50
+
+		tiles.push({x:34, y:294, w:97, h:18});	// Room desc fight					51
+		tiles.push({x:131, y:159, w:70, h:9});	// Action fight						52
+		
 	}
 	
 	static public function draw (c:BitmapData, id:Int, x:Int = 0, y:Int = 0) {

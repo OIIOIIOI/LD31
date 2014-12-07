@@ -50,6 +50,20 @@ class GUI extends Bitmap {
 		Tilesheet.draw(bitmapData, 30, 71, 24);
 	}
 	
+	public function displayFight () {
+		clear();
+		// BG
+		Tilesheet.draw(bitmapData, 19);
+		// Desc
+		Tilesheet.draw(bitmapData, 51, 38, 3);
+		// Image
+		Tilesheet.draw(bitmapData, 36, 3, 3);
+		// Space
+		Tilesheet.draw(bitmapData, 28, 38, 22);
+		// Action
+		Tilesheet.draw(bitmapData, 52, 71, 24);
+	}
+	
 	public function displayEmpty (stat:Int, value:Int) {
 		clear();
 		// BG
@@ -61,12 +75,20 @@ class GUI extends Bitmap {
 		// Action
 		Tilesheet.draw(bitmapData, 29, 71, 24);
 		// Stat
-		if (stat == 0)		Tilesheet.draw(bitmapData, 37, 11, 13);
-		else if (stat == 1)	Tilesheet.draw(bitmapData, 39, 11, 13);
-		else if (stat == 2)	Tilesheet.draw(bitmapData, 38, 11, 13);
-		else				Tilesheet.draw(bitmapData, 40, 11, 13);
+		var tID = switch (stat) {
+			default:	37;
+			case 1:		39;
+			case 2:		38;
+			case 3:		40;
+		}
+		Tilesheet.draw(bitmapData, tID, 11, 13);
 		// Arrows
-		Tilesheet.draw(bitmapData, 20, 1, 23);
+		tID = switch (stat) {
+			case 0:		21;
+			case 3:		22;
+			default:	20;
+		}
+		Tilesheet.draw(bitmapData, tID, 1, 23);
 		// Number
 		displayNumber(value, 18, 2);
 	}
@@ -86,6 +108,8 @@ class GUI extends Bitmap {
 		Tilesheet.draw(bitmapData, 28, 38, 22);
 		// Action
 		Tilesheet.draw(bitmapData, 31, 71, 24);
+		// Number
+		displayNumber(coins, 62, 11, false);
 	}
 	
 	function displayNumber (n:Int, xx:Int, yy:Int, center:Bool = true) {
