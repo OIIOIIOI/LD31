@@ -69,6 +69,22 @@ class Tilesheet {
 		tiles.push({x:34, y:276, w:97, h:18});	// Room desc loot L					35
 		
 		tiles.push({x:0, y:170, w:30, h:30});	// Empty square						36
+		
+		tiles.push({x:0, y:200, w:13, h:13});	// Icon health						37
+		tiles.push({x:13, y:200, w:13, h:13});	// Icon init						38
+		tiles.push({x:0, y:213, w:13, h:13});	// Icon dmg							39
+		tiles.push({x:13, y:213, w:13, h:13});	// Icon coins						40
+		
+		tiles.push({x:0, y:226, w:5, h:8});		// Number 0							41
+		tiles.push({x:5, y:226, w:5, h:8});		// Number 1							42
+		tiles.push({x:10, y:226, w:5, h:8});	// Number 2							43
+		tiles.push({x:15, y:226, w:5, h:8});	// Number 3							44
+		tiles.push({x:20, y:226, w:5, h:8});	// Number 4							45
+		tiles.push({x:0, y:234, w:5, h:8});		// Number 5							46
+		tiles.push({x:5, y:234, w:5, h:8});		// Number 6							47
+		tiles.push({x:10, y:234, w:5, h:8});	// Number 7							48
+		tiles.push({x:15, y:234, w:5, h:8});	// Number 8							49
+		tiles.push({x:20, y:234, w:5, h:8});	// Number 9							50
 	}
 	
 	static public function draw (c:BitmapData, id:Int, x:Int = 0, y:Int = 0) {

@@ -37,10 +37,12 @@ class Game extends Sprite {
 	var availableItems:Array<EItemType>;
 	var selectedItem:Int;
 	
+	var selectedStat:Int;
+	
 	var activeRoom:Int;
 	var foundMap:Bool;
 	
-	var actions:Map < Int, Void->Void > ;
+	var actions:Map<Int, Void->Void>;
 	
 	var screen:GUI;
 	
@@ -85,6 +87,8 @@ class Game extends Sprite {
 		availableItems = [];
 		selectedItem = 0;
 		
+		selectedStat = 0;
+		
 		foundMap = false;
 		
 		actions = new Map();
@@ -104,6 +108,12 @@ class Game extends Sprite {
 		actions.set(Keyboard.RIGHT, null);
 		actions.set(Keyboard.LEFT, null);
 		actions.set(Keyboard.SPACE, null);
+	}
+	
+	function setDefaultActions () {
+		actions.set(Keyboard.RIGHT, displayStat.bind(1));
+		actions.set(Keyboard.LEFT, displayStat.bind(-1));
+		actions.set(Keyboard.SPACE, goToNextRoom);
 	}
 	
 	function goToNextRoom () {
@@ -140,6 +150,7 @@ class Game extends Sprite {
 	}
 	
 	function updateGUI () {
+		resetActions();
 		var r:Room = map.rooms[activeRoom];
 		var e:Entity = r.content;
 		if (r.type == ERoomType.T_LOOT && e != null) {
@@ -148,8 +159,8 @@ class Game extends Sprite {
 				actions.set(Keyboard.SPACE, pickUpLoot.bind(cast(e, Loot)));
 			}
 			else {
-				screen.displayEmpty();
-				actions.set(Keyboard.SPACE, goToNextRoom);
+				screen.displayEmpty(selectedStat, getStatValue());
+				setDefaultActions();
 			}
 		}
 		else if (r.type == ERoomType.T_MONSTER && e != null) {
@@ -164,12 +175,26 @@ class Game extends Sprite {
 		}
 	}
 	
+	function displayStat (dir:Int) {
+		selectedStat += dir;
+		if (selectedStat < 0)	selectedStat += 4;
+		if (selectedStat > 3)	selectedStat -= 4;
+		screen.displayEmpty(selectedStat, getStatValue());
+	}
+	
+	function getStatValue () :Int {
+		if (selectedStat == 0)		return player.health;
+		else if (selectedStat == 1)	return player.dmg;
+		else if (selectedStat == 2)	return player.init;
+		else						return totalLoot;
+	}
+	
 	function pickUpLoot (e:Loot) {
 		totalLoot += e.value;
 		e.pickup();
-		trace("Total loot: " + totalLoot);
-		screen.displayEmpty();
-		actions.set(Keyboard.SPACE, goToNextRoom);
+		selectedStat = 3;
+		screen.displayEmpty(selectedStat, getStatValue());
+		setDefaultActions();
 	}
 	
 	function chooseItems () {
@@ -199,7 +224,6 @@ class Game extends Sprite {
 	
 	function grabItem () {
 		var item = availableItems[selectedItem];
-		trace("You picked " + item);
 		// Clear items
 		while (availableItems.length > 0)	availableItems.pop();
 		resetActions();
@@ -210,27 +234,26 @@ class Game extends Sprite {
 		switch (item) {
 			case EItemType.T_HEALTH:
 				player.health++;
-				trace("New health: " + player.health);
-				screen.displayEmpty();
-				actions.set(Keyboard.SPACE, goToNextRoom);
+				selectedStat = 0;
+				screen.displayEmpty(selectedStat, getStatValue());
+				setDefaultActions();
 			case EItemType.T_WEAPON:
 				player.dmg++;
-				trace("New dmg: " + player.dmg);
-				screen.displayEmpty();
-				actions.set(Keyboard.SPACE, goToNextRoom);
+				selectedStat = 1;
+				screen.displayEmpty(selectedStat, getStatValue());
+				setDefaultActions();
 			case EItemType.T_INITIATIVE:
 				player.init++;
-				trace("New init: " + player.init);
-				screen.displayEmpty();
-				actions.set(Keyboard.SPACE, goToNextRoom);
+				selectedStat = 2;
+				screen.displayEmpty(selectedStat, getStatValue());
+				setDefaultActions();
 			case EItemType.T_MAP:
-				trace("Map updated");
 				for (i in (activeRoom + 1)...map.rooms.length) {
 					map.rooms[i].updateTID(true);
 				}
 				foundMap = true;
-				screen.displayEmpty();
-				actions.set(Keyboard.SPACE, goToNextRoom);
+				screen.displayEmpty(selectedStat, getStatValue());
+				setDefaultActions();
 			case EItemType.T_LEVELUP:
 				levelUp();
 		}
@@ -280,8 +303,8 @@ class Game extends Sprite {
 	
 	function fightWon () {
 		trace("You won!");
-		screen.displayEmpty();
-		actions.set(Keyboard.SPACE, goToNextRoom);
+		screen.displayEmpty(selectedStat, getStatValue());
+		setDefaultActions();
 	}
 	
 	function levelUp () {
