@@ -59,8 +59,8 @@ class Game extends Sprite {
 		addChild(canvas);
 		
 		screen = new GUI();
-		screen.x = 288;
-		screen.y = 288;
+		screen.x = 144;
+		screen.y = 144;
 		addChild(screen);
 		
 		entities = [];
@@ -100,8 +100,14 @@ class Game extends Sprite {
 	}
 	
 	function placeRoom (r:Room, i:Int) {
-		r.y = Math.floor(i / 8) * Tilesheet.TILE_SIZE;
-		r.x = i % 8 * Tilesheet.TILE_SIZE;
+		//r.y = Math.floor(i / 8) * Tilesheet.TILE_SIZE;
+		//r.x = i % 8 * Tilesheet.TILE_SIZE;
+		//
+		var s = "0,0;1,0;2,0;3,0;4,0;5,0;6,0;7,0;7,1;7,2;7,3;7,4;7,5;6,5;5,5;4,5;3,5;2,5;1,5;0,5;0,4;0,3;0,2;0,1;1,1;2,1;3,1;4,1;5,1;6,1;6,2;6,3;6,4;5,4;4,4;3,4;2,4;1,4;1,3;1,2";
+		var a = s.split(";");
+		a = a[i].split(",");
+		r.x = Std.parseInt(a[0]) * Tilesheet.TILE_SIZE;
+		r.y = Std.parseInt(a[1]) * Tilesheet.TILE_SIZE;
 	}
 	
 	function resetActions () {
@@ -123,6 +129,8 @@ class Game extends Sprite {
 		var r:Room = map.rooms[activeRoom];
 		r.discover();
 		
+		trace(activeRoom);
+		
 		// Move player
 		player.x = r.x;
 		player.y = r.y;
@@ -136,6 +144,8 @@ class Game extends Sprite {
 				e = new Item();
 			case ERoomType.T_MONSTER:
 				e = new Monster(level);
+			default:
+				e = new Door();
 		}
 		e.x = r.x;
 		e.y = r.y;
@@ -174,13 +184,15 @@ class Game extends Sprite {
 			actions.set(Keyboard.RIGHT, selectItem.bind(1));
 			actions.set(Keyboard.SPACE, grabItem);
 		}
+		else {
+			if (r.type == ERoomType.T_END)	trace("THE END");
+			screen.displayEmpty(selectedStat, getStatValue());
+			setDefaultActions();
+		}
 	}
 	
 	function displayStat (dir:Int) {
 		selectedStat = Std.int(Math.min(Math.max(selectedStat + dir, 0), 3));
-		//selectedStat += dir;
-		//if (selectedStat < 0)	selectedStat += 4;
-		//if (selectedStat > 3)	selectedStat -= 4;
 		screen.displayEmpty(selectedStat, getStatValue());
 	}
 	
@@ -315,13 +327,13 @@ class Game extends Sprite {
 		trace("New level: " + level);
 		KeyboardMan.INST.cancelJustPressed(Keyboard.SPACE);
 		goToNextRoom();
-		for (i in 0...activeRoom) {
+		/*for (i in 0...activeRoom) {
 			map.rooms[i].lock();
 			if (map.rooms[i].content != null) {
 				entities.remove(map.rooms[i].content);
 				map.rooms[i].content = null;
 			}
-		}
+		}*/
 	}
 	
 	function gameOver () {

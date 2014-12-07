@@ -19,12 +19,14 @@ class WorldMap {
 		// Temp array
 		var tmp:Array<Room>;
 		
-		// Manually set the first room
+		// Manually set the first rooms
+		rooms.push(new Room(ERoomType.T_START));
 		rooms.push(new Room(ERoomType.T_LOOT));
 		// Tier 1
 		tmp = [];
 		tmp.push(new Room(ERoomType.T_ITEM));
 		tmp.push(new Room(ERoomType.T_ITEM));
+		tmp.push(new Room(ERoomType.T_LOOT));
 		tmp.push(new Room(ERoomType.T_LOOT));
 		tmp.push(new Room(ERoomType.T_LOOT));
 		tmp.push(new Room(ERoomType.T_LOOT));
@@ -70,11 +72,13 @@ class WorldMap {
 		tmp.push(new Room(ERoomType.T_MONSTER));
 		tmp.push(new Room(ERoomType.T_MONSTER));
 		tmp.push(new Room(ERoomType.T_MONSTER));
+		tmp.push(new Room(ERoomType.T_MONSTER));
 		tmp.push(new Room(ERoomType.T_ITEM));
 		tmp.push(new Room(ERoomType.T_LOOT));
 		shuffleAndConcat(tmp);
-		// Manually set the last room
+		// Manually set the last rooms
 		rooms.push(new Room(ERoomType.T_MONSTER));
+		rooms.push(new Room(ERoomType.T_END));
 	}
 	
 	function shuffleAndConcat (a:Array<Room>) {
