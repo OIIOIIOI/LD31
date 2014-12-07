@@ -79,6 +79,8 @@ class WorldMap {
 		// Manually set the last rooms
 		rooms.push(new Room(ERoomType.T_MONSTER));
 		rooms.push(new Room(ERoomType.T_END));
+		
+		//trace(rooms.length);
 	}
 	
 	function shuffleAndConcat (a:Array<Room>) {

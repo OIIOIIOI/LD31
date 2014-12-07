@@ -39,7 +39,7 @@ class Tilesheet {
 		tiles.push({x:96, y:72, w:TILE_SIZE, h:TILE_SIZE});	// No loot				13
 		
 		tiles.push({x:120, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Monster				14
-		tiles.push({x:120, y:24, w:TILE_SIZE, h:TILE_SIZE});// Monster dead			15
+		tiles.push({x:120, y:24, w:TILE_SIZE, h:TILE_SIZE});// Monster f2			15
 		
 		tiles.push({x:144, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Item					16
 		tiles.push({x:144, y:24, w:TILE_SIZE, h:TILE_SIZE});// Item opened			17
@@ -89,6 +89,17 @@ class Tilesheet {
 		tiles.push({x:34, y:294, w:97, h:18});	// Room desc fight					51
 		tiles.push({x:131, y:159, w:70, h:9});	// Action fight						52
 		
+		tiles.push({x:72, y:24, w:TILE_SIZE, h:TILE_SIZE});	// Player f2			53
+		
+		tiles.push({x:120, y:48, w:TILE_SIZE, h:TILE_SIZE});// Monster dead			54
+		tiles.push({x:168, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Monster hit			55
+		tiles.push({x:168, y:24, w:TILE_SIZE, h:TILE_SIZE});// Monster hit f2		56
+		
+		tiles.push({x:192, y:0, w:TILE_SIZE, h:TILE_SIZE});	// Player hit			57
+		tiles.push({x:192, y:24, w:TILE_SIZE, h:TILE_SIZE});// Player hit f2		58
+		tiles.push({x:72, y:48, w:TILE_SIZE, h:TILE_SIZE});// Player dead			59
+		
+		tiles.push({x:144, y:96, w:144, h:36});	// Item select BG 2					60
 	}
 	
 	static public function draw (c:BitmapData, id:Int, x:Int = 0, y:Int = 0) {

@@ -5,7 +5,7 @@ package ;
  * @author 01101101
  */
 
-class FightEntity extends Entity {
+class FightEntity extends AnimEntity {
 	
 	public var health:Int;
 	public var dmg:Int;
@@ -17,6 +17,7 @@ class FightEntity extends Entity {
 		health = dmg = init = 1;
 	}
 	
+	public function hit () { }
 	public function die () { }
 	
 }

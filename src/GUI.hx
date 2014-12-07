@@ -17,15 +17,24 @@ class GUI extends Bitmap {
 		
 		scaleX = scaleY = 2;
 		
-		bitmapData = new BitmapData(144, 36, false, 0xFF000033);
+		bitmapData = new BitmapData(144, 72, false, 0xFF000033);
 	}
 	
-	public function clear () {
-		bitmapData.fillRect(bitmapData.rect, 0xFF006633);
+	public function clear (top:Bool = true, bottom:Bool = false) {
+		Game.TAR.x = 0;
+		Game.TAR.width = 144;
+		Game.TAR.height = 36;
+		if (top) {
+			Game.TAR.y = 0;
+			bitmapData.fillRect(Game.TAR, 0xFF006633);
+		}
+		if (bottom) {
+			Game.TAR.y = 36;
+			bitmapData.fillRect(Game.TAR, 0xFF006633);
+		}
 	}
 	
 	public function displayItem (t:EItemType, isFirst:Bool, isLast:Bool) {
-		clear();
 		// BG
 		Tilesheet.draw(bitmapData, 19);
 		// Desc
@@ -64,7 +73,7 @@ class GUI extends Bitmap {
 		Tilesheet.draw(bitmapData, 52, 71, 24);
 	}
 	
-	public function displayEmpty (stat:Int, value:Int) {
+	public function displayEmpty () {
 		clear();
 		// BG
 		Tilesheet.draw(bitmapData, 19);
@@ -74,23 +83,6 @@ class GUI extends Bitmap {
 		Tilesheet.draw(bitmapData, 28, 38, 22);
 		// Action
 		Tilesheet.draw(bitmapData, 29, 71, 24);
-		// Stat
-		var tID = switch (stat) {
-			default:	37;
-			case 1:		39;
-			case 2:		38;
-			case 3:		40;
-		}
-		Tilesheet.draw(bitmapData, tID, 11, 13);
-		// Arrows
-		tID = switch (stat) {
-			case 0:		21;
-			case 3:		22;
-			default:	20;
-		}
-		Tilesheet.draw(bitmapData, tID, 1, 23);
-		// Number
-		displayNumber(value, 18, 2);
 	}
 	
 	public function displayLoot (tier:Int, coins:Int) {
@@ -110,6 +102,17 @@ class GUI extends Bitmap {
 		Tilesheet.draw(bitmapData, 31, 71, 24);
 		// Number
 		displayNumber(coins, 62, 11, false);
+	}
+	
+	public function displayStats (health:Int, dmg:Int, init:Int, loot:Int) {
+		clear(false, true);
+		// BG
+		Tilesheet.draw(bitmapData, 60, 0, 36);
+		// Number
+		displayNumber(health, 20, 40);
+		displayNumber(dmg, 20, 60);
+		displayNumber(loot, 100, 40);
+		displayNumber(init, 100, 60);
 	}
 	
 	function displayNumber (n:Int, xx:Int, yy:Int, center:Bool = true) {

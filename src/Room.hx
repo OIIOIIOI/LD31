@@ -42,8 +42,8 @@ class Room extends Entity {
 				case ERoomType.T_LOOT:		tID += 0;
 				case ERoomType.T_ITEM:		tID += 3;
 				case ERoomType.T_MONSTER:	tID += 6;
-				case ERoomType.T_START:		tID += 6;
-				case ERoomType.T_END:		tID += 6;
+				case ERoomType.T_START:		tID += 0;
+				case ERoomType.T_END:		tID += 0;
 			}
 		}
 		else if (force) {
@@ -51,8 +51,8 @@ class Room extends Entity {
 				case ERoomType.T_LOOT:		tID = 0;
 				case ERoomType.T_ITEM:		tID = 3;
 				case ERoomType.T_MONSTER:	tID = 6;
-				case ERoomType.T_START:		tID = 6;
-				case ERoomType.T_END:		tID = 6;
+				case ERoomType.T_START:		tID = 0;
+				case ERoomType.T_END:		tID = 0;
 			}
 		}
 	}

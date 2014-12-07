@@ -37,14 +37,15 @@ class Game extends Sprite {
 	var availableItems:Array<EItemType>;
 	var selectedItem:Int;
 	
-	var selectedStat:Int;
-	
 	var activeRoom:Int;
 	var foundMap:Bool;
 	
 	var actions:Map<Int, Void->Void>;
 	
 	var screen:GUI;
+	
+	var timer:Int;
+	var timedAction:Dynamic;
 	
 	public function new () {
 		super();
@@ -87,9 +88,9 @@ class Game extends Sprite {
 		availableItems = [];
 		selectedItem = 0;
 		
-		selectedStat = 0;
-		
 		foundMap = false;
+		
+		timer = 0;
 		
 		actions = new Map();
 		
@@ -117,8 +118,8 @@ class Game extends Sprite {
 	}
 	
 	function setDefaultActions () {
-		actions.set(Keyboard.RIGHT, displayStat.bind(1));
-		actions.set(Keyboard.LEFT, displayStat.bind(-1));
+		actions.set(Keyboard.RIGHT, null);
+		actions.set(Keyboard.LEFT, null);
 		actions.set(Keyboard.SPACE, goToNextRoom);
 	}
 	
@@ -128,8 +129,6 @@ class Game extends Sprite {
 		activeRoom++;
 		var r:Room = map.rooms[activeRoom];
 		r.discover();
-		
-		trace(activeRoom);
 		
 		// Move player
 		player.x = r.x;
@@ -169,7 +168,7 @@ class Game extends Sprite {
 				actions.set(Keyboard.SPACE, pickUpLoot.bind(cast(e, Loot)));
 			}
 			else {
-				screen.displayEmpty(selectedStat, getStatValue());
+				screen.displayEmpty();
 				setDefaultActions();
 			}
 		}
@@ -186,28 +185,15 @@ class Game extends Sprite {
 		}
 		else {
 			if (r.type == ERoomType.T_END)	trace("THE END");
-			screen.displayEmpty(selectedStat, getStatValue());
+			screen.displayEmpty();
 			setDefaultActions();
 		}
-	}
-	
-	function displayStat (dir:Int) {
-		selectedStat = Std.int(Math.min(Math.max(selectedStat + dir, 0), 3));
-		screen.displayEmpty(selectedStat, getStatValue());
-	}
-	
-	function getStatValue () :Int {
-		if (selectedStat == 0)		return player.health;
-		else if (selectedStat == 1)	return player.dmg;
-		else if (selectedStat == 2)	return player.init;
-		else						return totalLoot;
 	}
 	
 	function pickUpLoot (e:Loot) {
 		totalLoot += e.value;
 		e.pickup();
-		selectedStat = 3;
-		screen.displayEmpty(selectedStat, getStatValue());
+		screen.displayEmpty();
 		setDefaultActions();
 	}
 	
@@ -248,25 +234,22 @@ class Game extends Sprite {
 		switch (item) {
 			case EItemType.T_HEALTH:
 				player.health++;
-				selectedStat = 0;
-				screen.displayEmpty(selectedStat, getStatValue());
+				screen.displayEmpty();
 				setDefaultActions();
 			case EItemType.T_WEAPON:
 				player.dmg++;
-				selectedStat = 1;
-				screen.displayEmpty(selectedStat, getStatValue());
+				screen.displayEmpty();
 				setDefaultActions();
 			case EItemType.T_INITIATIVE:
 				player.init++;
-				selectedStat = 2;
-				screen.displayEmpty(selectedStat, getStatValue());
+				screen.displayEmpty();
 				setDefaultActions();
 			case EItemType.T_MAP:
 				for (i in (activeRoom + 1)...map.rooms.length) {
 					map.rooms[i].updateTID(true);
 				}
 				foundMap = true;
-				screen.displayEmpty(selectedStat, getStatValue());
+				screen.displayEmpty();
 				setDefaultActions();
 			case EItemType.T_LEVELUP:
 				levelUp();
@@ -277,48 +260,74 @@ class Game extends Sprite {
 		// Player initiative
 		if (player.init > e.init) {
 			trace("You strike first! " + player.health + "H/" + player.dmg + "D/" + player.init + "I");
-			fightRound(player, e);
+			timedAction = fightRound.bind(player, e);
+			timer = 60;
+			//fightRound(player, e);
 		}
 		// Monster initiative
 		else if (player.init < e.init) {
 			trace("The monster strikes first! " + e.health + "H/" + e.dmg + "D/" + e.init + "I");
-			fightRound(e, player);
+			timedAction = fightRound.bind(e, player);
+			timer = 60;
+			//fightRound(e, player);
 		}
 		// Random initiative
 		else {
 			if (RND.random(3) == 0) {
 				trace("The monster strikes first! " + e.health + "H/" + e.dmg + "D/" + e.init + "I");
-				fightRound(e, player);
+				timedAction = fightRound.bind(e, player);
+				timer = 60;
+				//fightRound(e, player);
 			}
 			else {
 				trace("You strike first! " + player.health + "H/" + player.dmg + "D/" + player.init + "I");
-				fightRound(player, e);
+				timedAction = fightRound.bind(player, e);
+				timer = 60;
+				//fightRound(player, e);
 			}
 		}
 	}
 	
 	function fightRound (att:FightEntity, def:FightEntity) {
+		if (att == player)	att.x = map.rooms[activeRoom].x + 2;
+		else				att.x = map.rooms[activeRoom].x - 2;
+		def.x = map.rooms[activeRoom].x;
+		//
 		def.health -= att.dmg;
+		def.hit();
 		// If def died
 		if (def.health <= 0) {
 			def.health = 0;
-			def.die();
+			//def.die();
 			// Check who it was
-			if (def == player)	gameOver();
-			else				fightWon();
+			if (def == player) {
+				timedAction = gameOver;
+				timer = 60;
+				//gameOver();
+			}
+			else {
+				timedAction = fightWon;
+				timer = 60;
+				//fightWon();
+			}
 		}
 		else {
 			if (def == player)	trace("Your health: " + def.health);
 			else				trace("Monster health: " + def.health);
 			// Change roles and fight next round
-			fightRound(def, att);
+			timedAction = fightRound.bind(def, att);
+			timer = 60;
+			//fightRound(def, att);
 		}
 	}
 	
 	function fightWon () {
 		trace("You won!");
-		selectedStat = 0;
-		screen.displayEmpty(selectedStat, getStatValue());
+		//
+		map.rooms[activeRoom].content.x = map.rooms[activeRoom].x;
+		player.x  = map.rooms[activeRoom].x;
+		//
+		screen.displayEmpty();
 		setDefaultActions();
 	}
 	
@@ -338,20 +347,32 @@ class Game extends Sprite {
 	
 	function gameOver () {
 		trace("GAME OVER");
+		//
+		map.rooms[activeRoom].content.x = map.rooms[activeRoom].x;
+		player.x  = map.rooms[activeRoom].x;
+		//
 		resetActions();
 	}
 	
 	function update (e:Event) {
+		// Timed action
+		if (timer > 0) {
+			timer--;
+			if (timer == 0)	timedAction();
+		}
 		// Player input
-		if (KeyboardMan.INST.getState(Keyboard.SPACE).justPressed && actions.get(Keyboard.SPACE) != null)	actions.get(Keyboard.SPACE)();
-		if (KeyboardMan.INST.getState(Keyboard.LEFT).justPressed && actions.get(Keyboard.LEFT) != null)		actions.get(Keyboard.LEFT)();
-		if (KeyboardMan.INST.getState(Keyboard.RIGHT).justPressed && actions.get(Keyboard.RIGHT) != null)	actions.get(Keyboard.RIGHT)();
+		else {
+			if (KeyboardMan.INST.getState(Keyboard.SPACE).justPressed && actions.get(Keyboard.SPACE) != null)	actions.get(Keyboard.SPACE)();
+			if (KeyboardMan.INST.getState(Keyboard.LEFT).justPressed && actions.get(Keyboard.LEFT) != null)		actions.get(Keyboard.LEFT)();
+			if (KeyboardMan.INST.getState(Keyboard.RIGHT).justPressed && actions.get(Keyboard.RIGHT) != null)	actions.get(Keyboard.RIGHT)();
+		}
 		// Update entities
 		for (e in entities) {
 			e.update();
 		}
 		// Render
 		render();
+		screen.displayStats(player.health, player.dmg, player.init, totalLoot);
 		// Update controls
 		KeyboardMan.INST.update();
 	}

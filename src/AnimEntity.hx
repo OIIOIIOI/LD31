@@ -11,10 +11,12 @@ class AnimEntity extends Entity {
 	var frame:Int;
 	var animTick:Int;
 	var animFrameRate:Int;
+	var animCallback:Dynamic;
 	
 	public function new () {
 		super();
 		
+		animCallback = null;
 		anim = new Array();
 		animFrameRate = animTick = 15;
 		frame = -1;
@@ -27,7 +29,10 @@ class AnimEntity extends Entity {
 		animTick--;
 		if (animTick == 0) {
 			frame++;
-			if (frame >= anim.length)	frame = 0;
+			if (frame >= anim.length) {
+				frame = 0;
+				if (animCallback != null)	animCallback();
+			}
 			animTick = animFrameRate;
 		}
 	}
