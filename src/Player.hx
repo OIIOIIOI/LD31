@@ -24,8 +24,14 @@ class Player extends FightEntity {
 		frame = 0;
 		animTick = animFrameRate;
 		
-		if (health > 0)	animCallback = resume;
-		else			animCallback = die;
+		if (health > 0) {
+			SoundMan.play(SoundMan.SND_HIT);
+			animCallback = resume;
+		}
+		else {
+			SoundMan.play(SoundMan.SND_DEATH_PLAYER);
+			animCallback = die;
+		}
 	}
 	
 	function resume () {

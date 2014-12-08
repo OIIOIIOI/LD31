@@ -52,8 +52,9 @@ class Game extends Sprite {
 		
 		KeyboardMan.init();
 		Tilesheet.init();
+		SoundMan.init();
 		
-		canvasData = new BitmapData(300, 200, false, 0xFF808080);
+		canvasData = new BitmapData(192, 144, false, 0xFF808080);
 		
 		canvas = new Bitmap(canvasData);
 		canvas.scaleX = canvas.scaleY = SCALE;
@@ -194,6 +195,11 @@ class Game extends Sprite {
 	}
 	
 	function pickUpLoot (e:Loot) {
+		switch (e.tier) {
+			default:	SoundMan.play(SoundMan.SND_LOOT_S);
+			case 1:		SoundMan.play(SoundMan.SND_LOOT_M);
+			case 2:		SoundMan.play(SoundMan.SND_LOOT_L);
+		}
 		totalLoot += e.value;
 		e.pickup();
 		screen.displayEmpty();
@@ -257,9 +263,13 @@ class Game extends Sprite {
 			case EItemType.T_LEVELUP:
 				levelUp();
 		}
+		SoundMan.play(SoundMan.SND_ITEM);
 	}
 	
 	function fight (e:Monster) {
+		// Hide SPACE
+		screen.displayFight(false);
+		//
 		var st = 30;
 		// Player initiative
 		if (player.init > e.init) {
@@ -306,19 +316,19 @@ class Game extends Sprite {
 			// Check who it was
 			if (def == player) {
 				timedAction = gameOver;
-				timer = 60;
+				timer = 30;
 				//gameOver();
 			}
 			else {
 				timedAction = fightWon;
-				timer = 60;
+				timer = 30;
 				//fightWon();
 			}
 		}
 		else {
 			// Change roles and fight next round
 			timedAction = fightRound.bind(def, att);
-			timer = 60;
+			timer = 30;
 			//fightRound(def, att);
 		}
 	}

@@ -4,7 +4,6 @@
 	<meta charset="utf-8">
 	<title>LD31 - Ram Dungeon - 01101101</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
-	<link rel="stylesheet" href="style.min.css" />
 </head>
 <body>
 	
@@ -22,7 +21,7 @@
 		<div id="navbar" class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
 				<li class="active"><a href="http://01101101.fr/ld31"><span class="glyphicon glyphicon-play" aria-hidden="true"></span> Play</a></li>
-				<li><a href="http://ludumdare.com/compo"><span class="glyphicon glyphicon-star" aria-hidden="true"></span> Rate & comment</a></li>
+				<li><a href="http://ludumdare.com/compo/ludum-dare-31/?action=preview&uid=5105"><span class="glyphicon glyphicon-star" aria-hidden="true"></span> Rate & comment</a></li>
 				<li><a href="https://github.com/OIIOIIOI/LD31"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Source code</a></li>
 				<li><a href="https://twitter.com/OIIOIIOI"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Say hello</a></li>
 			</ul>
@@ -36,8 +35,8 @@
 	<script>
 		swf = $.flash.create({
 			swf:'LD31.swf',
-			width:800,
-			height:600
+			width:576,
+			height:432
 		});
 		$(document).ready(function () {
 			$('#game').html(swf);
@@ -47,6 +46,16 @@
 	<div class="container">
 		<div id="game"></div>
 	</div>
-	<p>If the keyboard is not responding, click once on the game to focus it.</p>
+	
+	<div class="container">
+		<p>
+			Explore the dungeon to collect as much gold as possible.<br/>
+			Chests contain items that can help you, as well as dungeon upgrades to make the treasures more interesting.<br/>
+			But beware! Upgrading the dungeon also makes the monsters stronger...
+		</p>
+		<p style="font-style:italic;">
+			If the keyboard is not responding, click once on the game to focus it.
+		</p>
+	</div>
 </body>
 </html>

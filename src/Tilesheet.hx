@@ -113,6 +113,13 @@ class Tilesheet {
 		tiles.push({x:0, y:242, w:34, h:9});	// Arrow f2							67
 		tiles.push({x:0, y:251, w:34, h:9});	// Arrow f2							68
 		tiles.push({x:0, y:260, w:34, h:9});	// Arrow f2							69
+
+		tiles.push({x:216, y:0, w:30, h:30});	// Img grass						70
+		tiles.push({x:216, y:30, w:30, h:30});	// Img lvl up						71
+		tiles.push({x:246, y:0, w:30, h:30});	// Img map							72
+		tiles.push({x:246, y:30, w:30, h:30});	// Img spikes						73
+		tiles.push({x:276, y:00, w:30, h:30});	// Img hoof							74
+		
 	}
 	
 	static public function draw (c:BitmapData, id:Int, x:Int = 0, y:Int = 0) {
